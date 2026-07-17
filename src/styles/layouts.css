@@ -80,7 +80,7 @@
     aspect-ratio: 1;
   }
 
-  @container contribution-photo (max-height: 15rem) {
+  @container contribution-photo (max-height: 15rem) or (max-width: 17.5rem) {
     .photo-frame:not(.photo-frame--film):not(.photo-frame--photobooth) {
       gap: clamp(0.15rem, 2cqh, 0.3rem);
       padding: clamp(0.3rem, 4cqh, 0.5rem);
