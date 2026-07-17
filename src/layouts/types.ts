@@ -17,15 +17,25 @@ export type PiecePlacement = Readonly<{
   z?: number;
 }>;
 
+export type PhotoPlacement = PiecePlacement &
+  Readonly<{
+    height: string;
+  }>;
+
 export type ResponsivePlacement = Readonly<{
   desktop: PiecePlacement;
   mobile: PiecePlacement;
 }>;
 
+export type ResponsivePhotoPlacement = Readonly<{
+  desktop: PhotoPlacement;
+  mobile: PhotoPlacement;
+}>;
+
 export type PhotoPiece = Readonly<{
   photoIndex: number;
   variant: PhotoFrameVariant;
-  placement: ResponsivePlacement;
+  placement: ResponsivePhotoPlacement;
 }>;
 
 export type MessagePiece = Readonly<{

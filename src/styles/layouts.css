@@ -64,15 +64,38 @@
     min-height: 0;
   }
 
-  .contribution-piece--photo .photo-frame__image-wrap {
+  .contribution-piece--photo
+    .photo-frame:not(.photo-frame--photobooth)
+    .photo-frame__image-wrap {
     aspect-ratio: auto;
   }
 
-  @container contribution-photo (max-height: 12rem) {
-    .photo-frame {
+  .contribution-piece--photo
+    .photo-frame--photobooth
+    .photo-frame__image-wrap {
+    width: auto;
+    max-width: 100%;
+    height: 100%;
+    justify-self: center;
+    aspect-ratio: 1;
+  }
+
+  @container contribution-photo (max-height: 15rem) {
+    .photo-frame:not(.photo-frame--film):not(.photo-frame--photobooth) {
       gap: clamp(0.15rem, 2cqh, 0.3rem);
       padding: clamp(0.3rem, 4cqh, 0.5rem);
       padding-bottom: clamp(0.4rem, 5cqh, 0.65rem);
+    }
+
+    .photo-frame--photobooth {
+      gap: 0;
+      padding: clamp(0.3rem, 4cqh, 0.5rem);
+    }
+
+    .photo-frame--film {
+      gap: 0;
+      padding-block: clamp(1rem, 9cqh, 1.35rem);
+      padding-inline: clamp(0.7rem, 4cqw, 1rem);
     }
 
     .photo-frame__placeholder {
