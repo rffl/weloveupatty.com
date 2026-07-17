@@ -45,9 +45,60 @@
     transform-origin: center;
   }
 
+  .contribution-piece--photo {
+    min-height: 0;
+    container-name: contribution-photo;
+    container-type: size;
+  }
+
   .contribution-piece--photo .photo-frame {
     grid-template-rows: minmax(0, 1fr) auto;
+    width: 100%;
     height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .contribution-piece--photo .photo-frame__image-wrap,
+  .contribution-piece--photo .photo-frame__placeholder {
+    min-height: 0;
+  }
+
+  .contribution-piece--photo .photo-frame__image-wrap {
+    aspect-ratio: auto;
+  }
+
+  @container contribution-photo (max-height: 12rem) {
+    .photo-frame {
+      gap: clamp(0.15rem, 2cqh, 0.3rem);
+      padding: clamp(0.3rem, 4cqh, 0.5rem);
+      padding-bottom: clamp(0.4rem, 5cqh, 0.65rem);
+    }
+
+    .photo-frame__placeholder {
+      gap: 0.1rem;
+      padding: clamp(0.2rem, 3cqh, 0.35rem);
+    }
+
+    .photo-frame__placeholder-star,
+    .photo-frame__placeholder small {
+      display: none;
+    }
+
+    .photo-frame__placeholder strong {
+      font-size: clamp(0.9rem, 11cqh, 1.2rem);
+      line-height: 1;
+    }
+
+    .photo-frame figcaption {
+      display: -webkit-box;
+      font-size: clamp(0.72rem, 8cqh, 0.95rem);
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+      white-space: normal;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
   }
 
   .contribution-piece--message .openable-note {
@@ -72,15 +123,20 @@
   }
 
   .contribution-name {
+    display: -webkit-box;
     max-width: 100%;
+    max-height: 1.8em;
     margin: 0;
     overflow: hidden;
     font-family: var(--font-hand);
     font-size: clamp(1.45rem, 3.5vw, 2.6rem);
     font-weight: 700;
-    line-height: 0.85;
+    line-height: 0.9;
+    overflow-wrap: anywhere;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .contribution-piece--name::after {

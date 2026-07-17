@@ -43,7 +43,7 @@ export type LayoutRecipe = Readonly<{
   id: ContributionLayout;
   surface: PageSurface;
   namePlacement: ResponsivePlacement;
-  photos: readonly PhotoPiece[];
+  photos: readonly [PhotoPiece, ...PhotoPiece[]];
   message: MessagePiece;
   decorations: readonly DecorationPiece[];
 }>;
