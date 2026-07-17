@@ -1,8 +1,8 @@
-import "@fontsource/caveat/500.css";
-import "@fontsource/caveat/600.css";
-import "@fontsource/caveat/700.css";
-import "@fontsource/dm-serif-display/400.css";
-import "@fontsource/special-elite/400.css";
+import "@fontsource/caveat/latin-500.css";
+import "@fontsource/caveat/latin-600.css";
+import "@fontsource/caveat/latin-700.css";
+import "@fontsource/dm-serif-display/latin-400.css";
+import "@fontsource/special-elite/latin-400.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
