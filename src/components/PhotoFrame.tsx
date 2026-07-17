@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { ContributionPhoto } from "../content/types";
 
@@ -22,13 +22,9 @@ export function PhotoFrame({
   className = "",
   eager = false,
 }: PhotoFrameProps) {
-  const [failed, setFailed] = useState(false);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
-  useEffect(() => {
-    setFailed(false);
-  }, [photo.src]);
-
-  const showImage = Boolean(photo.src) && !failed;
+  const showImage = Boolean(photo.src) && failedSrc !== photo.src;
 
   return (
     <figure
@@ -39,8 +35,9 @@ export function PhotoFrame({
           <img
             alt={photo.alt}
             decoding="async"
+            key={photo.src}
             loading={eager ? "eager" : "lazy"}
-            onError={() => setFailed(true)}
+            onError={() => setFailedSrc(photo.src)}
             src={photo.src ?? undefined}
             style={{
               objectPosition: `center ${photo.focalPoint ?? "center"}`,

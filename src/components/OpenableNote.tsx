@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { ReadingView } from "./ReadingView";
 
@@ -39,29 +39,8 @@ export function OpenableNote({
   className = "",
 }: OpenableNoteProps) {
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const shouldRestoreFocusRef = useRef(false);
-
-  useEffect(() => {
-    if (open || !shouldRestoreFocusRef.current) {
-      return;
-    }
-
-    shouldRestoreFocusRef.current = false;
-
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const frame = window.requestAnimationFrame(() => {
-      triggerRef.current?.focus();
-    });
-
-    return () => window.cancelAnimationFrame(frame);
-  }, [open]);
 
   const openNote = () => {
-    shouldRestoreFocusRef.current = false;
     setOpen(true);
   };
 
@@ -70,17 +49,17 @@ export function OpenableNote({
       return;
     }
 
-    shouldRestoreFocusRef.current = true;
     setOpen(false);
   };
 
   return (
     <>
       <button
+        aria-expanded={open}
+        aria-haspopup="dialog"
         aria-label={`Open ${title}'s full message`}
         className={`openable-note openable-note--${variant} ${className}`.trim()}
         onClick={openNote}
-        ref={triggerRef}
         type="button"
       >
         <span className="openable-note__eyebrow">A note from</span>

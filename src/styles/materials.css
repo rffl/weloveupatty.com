@@ -139,7 +139,10 @@
 
   .photo-frame--photobooth figcaption,
   .photo-frame--film figcaption {
-    display: none;
+    padding-block-start: clamp(0.2rem, 0.8vw, 0.4rem);
+    color: var(--color-paper-light);
+    font-size: clamp(0.78rem, 2vw, 1.05rem);
+    line-height: 1;
   }
 
   .openable-note {
@@ -265,6 +268,11 @@
 
   .openable-note__eyebrow {
     color: var(--color-ink-soft);
+  }
+
+  .openable-note--envelope .openable-note__eyebrow,
+  .openable-note--sticky .openable-note__eyebrow {
+    color: var(--color-ink);
   }
 
   .openable-note__name {

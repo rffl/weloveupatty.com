@@ -74,9 +74,11 @@ export function ReadingView({
           Close ×
         </button>
 
-        {detail ? <p className="reading-view__detail">{detail}</p> : null}
-        <h2 id={titleId}>{title}</h2>
-        <p className="reading-view__message">{message}</p>
+        <div className="reading-view__content">
+          {detail ? <p className="reading-view__detail">{detail}</p> : null}
+          <h2 id={titleId}>{title}</h2>
+          <p className="reading-view__message">{message}</p>
+        </div>
       </article>
     </dialog>
   );
