@@ -11,11 +11,16 @@ export type DecorationKind =
   | "map"
   | "heart";
 
+export type DecorationStyle = CSSProperties & {
+  "--rotation"?: string;
+  "--piece-z"?: string | number;
+};
+
 type DecorationProps = {
   kind: DecorationKind;
   className?: string;
   label?: string;
-  style?: CSSProperties;
+  style?: DecorationStyle;
 };
 
 const defaultLabels: Record<DecorationKind, string> = {
