@@ -5,7 +5,302 @@
     repeating-linear-gradient(92deg, transparent 0 28px, rgb(36 18 10 / 7%) 29px 31px),
     linear-gradient(135deg, #725744, var(--color-table) 58%, var(--color-table-dark));
 }
+}
 
+@layer components {
+  .photo-frame {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: clamp(0.35rem, 1vw, 0.65rem);
+    width: 100%;
+    min-width: 0;
+    padding: clamp(0.55rem, 1.6vw, 0.85rem);
+    padding-bottom: clamp(1.15rem, 3vw, 2rem);
+    margin: 0;
+    color: var(--color-ink);
+    background:
+      repeating-linear-gradient(4deg, rgb(84 54 31 / 2%) 0 1px, transparent 1px 7px),
+      var(--color-paper-light);
+    box-shadow: var(--shadow-lifted);
+  }
+
+  .photo-frame--snapshot {
+    padding: clamp(0.4rem, 1.2vw, 0.65rem);
+    padding-bottom: clamp(0.65rem, 1.8vw, 1rem);
+  }
+
+  .photo-frame--photobooth {
+    gap: 0;
+    padding: clamp(0.35rem, 1vw, 0.55rem);
+    color: var(--color-paper-light);
+    background: #292725;
+  }
+
+  .photo-frame--film {
+    gap: 0;
+    padding: clamp(1rem, 2.7vw, 1.35rem) clamp(0.7rem, 1.8vw, 1rem);
+    color: var(--color-paper-light);
+    background:
+      repeating-linear-gradient(
+          90deg,
+          var(--color-paper-light) 0 0.45rem,
+          transparent 0.45rem 0.9rem
+        )
+        top 0.32rem left 0.65rem / calc(100% - 1.3rem) 0.32rem repeat-x,
+      repeating-linear-gradient(
+          90deg,
+          var(--color-paper-light) 0 0.45rem,
+          transparent 0.45rem 0.9rem
+        )
+        bottom 0.32rem left 0.65rem / calc(100% - 1.3rem) 0.32rem repeat-x,
+      #292725;
+  }
+
+  .photo-frame--postcard {
+    padding: clamp(0.65rem, 1.8vw, 1rem);
+    padding-bottom: clamp(0.85rem, 2.3vw, 1.3rem);
+    background:
+      repeating-linear-gradient(6deg, rgb(110 71 34 / 3%) 0 1px, transparent 1px 6px),
+      var(--color-paper);
+    border: 1px solid rgb(82 55 34 / 16%);
+  }
+
+  .photo-frame__image-wrap {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: var(--color-paper-dark);
+  }
+
+  .photo-frame--photobooth .photo-frame__image-wrap {
+    aspect-ratio: 1;
+  }
+
+  .photo-frame__image-wrap img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.88) contrast(0.94) sepia(0.08);
+  }
+
+  .photo-frame__placeholder {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-content: center;
+    place-items: center;
+    gap: clamp(0.15rem, 0.7vw, 0.4rem);
+    padding: clamp(0.75rem, 4vw, 1.5rem);
+    color: var(--color-ink);
+    background:
+      linear-gradient(135deg, transparent 47%, rgb(164 75 67 / 13%) 48% 52%, transparent 53%),
+      repeating-linear-gradient(
+        -45deg,
+        rgb(255 255 255 / 22%) 0 0.45rem,
+        rgb(110 77 45 / 7%) 0.45rem 0.9rem
+      ),
+      var(--color-paper);
+    text-align: center;
+  }
+
+  .photo-frame__placeholder-star {
+    color: var(--color-postmark-red);
+    font-size: clamp(1.1rem, 3vw, 1.65rem);
+    line-height: 1;
+  }
+
+  .photo-frame__placeholder strong {
+    font-family: var(--font-hand);
+    font-size: clamp(1.45rem, 5vw, 2.35rem);
+    line-height: 1;
+  }
+
+  .photo-frame__placeholder small {
+    max-width: 28ch;
+    color: var(--color-ink-soft);
+    font-family: var(--font-typewriter);
+    font-size: clamp(0.58rem, 1.6vw, 0.72rem);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .photo-frame figcaption {
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--font-hand);
+    font-size: clamp(1rem, 3vw, 1.45rem);
+    line-height: 1;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .photo-frame--photobooth figcaption,
+  .photo-frame--film figcaption {
+    display: none;
+  }
+
+  .openable-note {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: clamp(0.25rem, 1vw, 0.55rem);
+    width: 100%;
+    min-height: 100%;
+    padding: clamp(1rem, 4vw, 1.75rem);
+    overflow: hidden;
+    appearance: none;
+    border: 0;
+    border-radius: 0;
+    color: var(--color-ink);
+    box-shadow: var(--shadow-lifted);
+    text-align: left;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+
+  .openable-note > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .openable-note--letter,
+  .openable-note--love-letter {
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0 1.55rem,
+        rgb(49 95 114 / 17%) 1.55rem calc(1.55rem + 1px)
+      ),
+      var(--color-paper-light);
+  }
+
+  .openable-note--envelope {
+    background:
+      linear-gradient(32deg, transparent 49.4%, rgb(90 58 32 / 16%) 49.8% 50.3%, transparent 50.7%),
+      linear-gradient(-32deg, transparent 49.4%, rgb(90 58 32 / 16%) 49.8% 50.3%, transparent 50.7%),
+      linear-gradient(145deg, transparent 0 49%, rgb(255 255 255 / 13%) 49.4% 100%),
+      #c7a778;
+  }
+
+  .openable-note--notebook,
+  .openable-note--diary {
+    padding-inline-start: clamp(2.75rem, 12%, 4rem);
+    background:
+      linear-gradient(
+        90deg,
+        transparent 0 clamp(1.8rem, 8%, 2.5rem),
+        rgb(164 75 67 / 48%) clamp(1.8rem, 8%, 2.5rem) calc(clamp(1.8rem, 8%, 2.5rem) + 1px),
+        transparent calc(clamp(1.8rem, 8%, 2.5rem) + 1px)
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0 1.55rem,
+        rgb(49 95 114 / 18%) 1.55rem calc(1.55rem + 1px)
+      ),
+      var(--color-paper-light);
+  }
+
+  .openable-note--postcard {
+    background:
+      repeating-linear-gradient(6deg, rgb(110 71 34 / 3%) 0 1px, transparent 1px 6px),
+      var(--color-paper);
+  }
+
+  .openable-note--postcard::before {
+    position: absolute;
+    top: 9%;
+    bottom: 9%;
+    left: 68%;
+    width: 1px;
+    background: rgb(103 88 76 / 28%);
+    content: "";
+  }
+
+  .openable-note--sticky {
+    background:
+      linear-gradient(145deg, transparent 0 92%, rgb(95 61 24 / 16%) 92.5%),
+      var(--color-ticket-mustard);
+  }
+
+  .openable-note--receipt,
+  .openable-note--ticket {
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0 1.3rem,
+        rgb(52 42 37 / 8%) 1.3rem calc(1.3rem + 1px)
+      ),
+      #eee8da;
+  }
+
+  .openable-note--ticket {
+    background-color: #e4d6ba;
+    border-inline: 0.35rem double rgb(52 42 37 / 20%);
+  }
+
+  .openable-note--love-letter::after {
+    position: absolute;
+    right: clamp(0.8rem, 3vw, 1.4rem);
+    bottom: clamp(2.15rem, 7vw, 3rem);
+    color: var(--color-postmark-red);
+    font-family: var(--font-hand);
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    line-height: 1;
+    content: "♥";
+    opacity: 0.82;
+    transform: rotate(8deg);
+  }
+
+  .openable-note__eyebrow,
+  .openable-note__hint {
+    font-family: var(--font-typewriter);
+    font-size: clamp(0.58rem, 1.6vw, 0.72rem);
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .openable-note__eyebrow {
+    color: var(--color-ink-soft);
+  }
+
+  .openable-note__name {
+    font-family: var(--font-hand);
+    font-size: clamp(1.75rem, 5vw, 2.65rem);
+    line-height: 0.95;
+  }
+
+  .openable-note__preview {
+    display: -webkit-box;
+    align-self: start;
+    overflow: hidden;
+    font-family: var(--font-hand);
+    font-size: clamp(1.15rem, 3.4vw, 1.6rem);
+    line-height: 1.18;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+  }
+
+  .openable-note__hint {
+    align-self: end;
+    justify-self: end;
+    margin-top: clamp(0.4rem, 2vw, 0.9rem);
+  }
+
+  @media (hover: hover) {
+    .openable-note:hover {
+      box-shadow: var(--shadow-book);
+      transform: translateY(-0.18rem) rotate(-0.35deg);
+    }
+  }
+}
+
+@layer components {
 .paper-surface {
   color: var(--color-ink);
   background:
