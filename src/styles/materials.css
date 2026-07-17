@@ -1,0 +1,152 @@
+.table-surface {
+  background:
+    radial-gradient(circle at 24% 8%, rgb(255 236 205 / 10%), transparent 30%),
+    repeating-linear-gradient(92deg, transparent 0 28px, rgb(36 18 10 / 7%) 29px 31px),
+    linear-gradient(135deg, #725744, var(--color-table) 58%, var(--color-table-dark));
+}
+
+.paper-surface {
+  color: var(--color-ink);
+  background:
+    repeating-linear-gradient(4deg, rgb(84 54 31 / 2%) 0 1px, transparent 1px 7px),
+    var(--color-paper);
+  box-shadow: inset 0 0 28px rgb(93 60 34 / 12%);
+}
+
+.paper-surface--light {
+  background-color: var(--color-paper-light);
+}
+
+.paper-surface--graph {
+  background:
+    linear-gradient(rgb(70 105 118 / 12%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(70 105 118 / 12%) 1px, transparent 1px),
+    var(--color-paper-light);
+  background-size: 18px 18px;
+}
+
+.paper-surface--kraft {
+  background:
+    repeating-linear-gradient(8deg, rgb(77 48 26 / 3%) 0 1px, transparent 1px 5px),
+    #c7a778;
+}
+
+.paper-surface--black {
+  color: #f2e7d4;
+  background: #292725;
+}
+
+.decoration {
+  position: absolute;
+  z-index: var(--piece-z, 4);
+  transform: rotate(var(--rotation, 0deg));
+  pointer-events: none;
+  user-select: none;
+}
+
+.decoration--tape {
+  width: 5rem;
+  height: 1.35rem;
+  background:
+    linear-gradient(100deg, rgb(255 255 255 / 14%), transparent 38% 72%, rgb(79 51 25 / 8%)),
+    rgb(218 199 151 / 72%);
+  border-inline: 2px dotted rgb(82 60 34 / 18%);
+  box-shadow: 0 1px 2px rgb(58 36 18 / 16%);
+}
+
+.decoration--stamp {
+  display: grid;
+  min-width: 4.4rem;
+  min-height: 4.4rem;
+  place-items: center;
+  padding: 0.45rem;
+  color: var(--color-postmark-red);
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  line-height: 1.05;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+}
+
+.decoration--ticket,
+.decoration--receipt {
+  padding: 0.7rem 0.65rem;
+  color: var(--color-ink);
+  background: var(--color-ticket-mustard);
+  box-shadow: var(--shadow-contact);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.decoration--receipt {
+  background: #eee8da;
+  clip-path: polygon(0 0, 100% 0, 100% 94%, 92% 100%, 84% 94%, 76% 100%, 68% 94%, 60% 100%, 52% 94%, 44% 100%, 36% 94%, 28% 100%, 20% 94%, 12% 100%, 4% 94%, 0 100%);
+}
+
+.decoration--doodle {
+  color: var(--color-tram-blue);
+  font-family: var(--font-hand);
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.decoration--flower {
+  width: 2.2rem;
+  height: 5.4rem;
+  border-left: 2px solid #65755d;
+  opacity: 0.72;
+}
+
+.decoration--flower::before,
+.decoration--flower::after {
+  position: absolute;
+  width: 1.35rem;
+  height: 1.8rem;
+  background: #c28d78;
+  border-radius: 55% 45% 58% 42%;
+  content: "";
+}
+
+.decoration--flower::before {
+  top: -0.2rem;
+  left: -0.7rem;
+  transform: rotate(-28deg);
+}
+
+.decoration--flower::after {
+  top: 0.1rem;
+  left: 0.2rem;
+  transform: rotate(28deg);
+}
+
+.decoration--film {
+  width: 7rem;
+  height: 2.1rem;
+  background:
+    repeating-linear-gradient(90deg, #ede2ce 0 7px, transparent 7px 14px) top / auto 5px repeat-x,
+    repeating-linear-gradient(90deg, #ede2ce 0 7px, transparent 7px 14px) bottom / auto 5px repeat-x,
+    #282725;
+  box-shadow: var(--shadow-contact);
+}
+
+.decoration--map {
+  width: 7rem;
+  height: 5rem;
+  background:
+    linear-gradient(42deg, transparent 42%, rgb(49 95 114 / 28%) 43% 45%, transparent 46%),
+    linear-gradient(-32deg, transparent 48%, rgb(164 75 67 / 24%) 49% 51%, transparent 52%),
+    #dfcfb1;
+  box-shadow: var(--shadow-contact);
+}
+
+.decoration--heart {
+  color: var(--color-postmark-red);
+  font-family: var(--font-hand);
+  font-size: 2.5rem;
+  line-height: 1;
+}

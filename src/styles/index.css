@@ -1,9 +1,14 @@
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./materials.css";
+@import "./scrapbook.css";
+@import "./layouts.css";
+@import "./accessibility.css";
 
 :root {
-  font-family: "Special Elite", ui-monospace, monospace;
-  color: #342a25;
-  background: #3f3028;
+  font-family: var(--font-typewriter);
+  color: var(--color-ink);
+  background: var(--color-table-dark);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -20,7 +25,16 @@ body,
   margin: 0;
 }
 
+body {
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
 button,
 dialog {
   font: inherit;
+}
+
+button {
+  color: inherit;
 }
