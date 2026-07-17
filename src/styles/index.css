@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  font-family: "Special Elite", ui-monospace, monospace;
+  color: #342a25;
+  background: #3f3028;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+button,
+dialog {
+  font: inherit;
+}
