@@ -29,36 +29,36 @@ export type ContributionAccent = (typeof accentIds)[number];
 export type PhotoFocalPoint = "top" | "center" | "bottom";
 
 export type ContributionPhoto = {
-  src: string | null;
-  alt: string;
-  caption?: string;
-  focalPoint?: PhotoFocalPoint;
+  readonly src: string | null;
+  readonly alt: string;
+  readonly caption?: string;
+  readonly focalPoint?: PhotoFocalPoint;
 };
 
 export type Contribution = {
-  id: string;
-  friendName: string;
-  message: string;
-  photos: readonly [ContributionPhoto, ...ContributionPhoto[]];
-  layout: ContributionLayout;
-  accent: ContributionAccent;
-  melbourneDetail?: string;
-  location?: string;
-  year?: string;
+  readonly id: string;
+  readonly friendName: string;
+  readonly message: string;
+  readonly photos: readonly [ContributionPhoto, ...ContributionPhoto[]];
+  readonly layout: ContributionLayout;
+  readonly accent: ContributionAccent;
+  readonly melbourneDetail?: string;
+  readonly location?: string;
+  readonly year?: string;
 };
 
 export type ScrapbookContent = {
-  title: string;
-  subtitle: string;
-  opening: {
-    eyebrow: string;
-    title: string;
-    message: string;
+  readonly title: string;
+  readonly subtitle: string;
+  readonly opening: {
+    readonly eyebrow: string;
+    readonly title: string;
+    readonly message: string;
   };
-  closing: {
-    title: string;
-    message: string;
-    signature: string;
+  readonly closing: {
+    readonly title: string;
+    readonly message: string;
+    readonly signature: string;
   };
-  contributions: readonly Contribution[];
+  readonly contributions: readonly Contribution[];
 };

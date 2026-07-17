@@ -1,31 +1,33 @@
 import type { Contribution, ScrapbookContent } from "../content/types";
 
 export type OpeningPage = {
-  id: "opening";
-  kind: "opening";
-  content: ScrapbookContent["opening"];
+  readonly id: "opening";
+  readonly kind: "opening";
+  readonly content: ScrapbookContent["opening"];
 };
 
 export type ContributionPage = {
-  id: string;
-  kind: "contribution";
-  contribution: Contribution;
+  readonly id: string;
+  readonly kind: "contribution";
+  readonly contribution: Contribution;
 };
 
 export type ClosingPage = {
-  id: "closing";
-  kind: "closing";
-  content: ScrapbookContent["closing"];
+  readonly id: "closing";
+  readonly kind: "closing";
+  readonly content: ScrapbookContent["closing"];
 };
 
 export type ScrapbookPage = OpeningPage | ContributionPage | ClosingPage;
 
 export type DesktopSpread = {
-  index: number;
-  pages: readonly [ScrapbookPage] | readonly [ScrapbookPage, ScrapbookPage];
+  readonly index: number;
+  readonly pages:
+    | readonly [ScrapbookPage]
+    | readonly [ScrapbookPage, ScrapbookPage];
 };
 
-export function buildPages(content: ScrapbookContent): ScrapbookPage[] {
+export function buildPages(content: ScrapbookContent): readonly ScrapbookPage[] {
   if (content.contributions.length !== 15) {
     throw new Error(
       `The scrapbook requires exactly 15 contributions; received ${content.contributions.length}.`,
@@ -36,6 +38,16 @@ export function buildPages(content: ScrapbookContent): ScrapbookPage[] {
 
   if (ids.size !== content.contributions.length) {
     throw new Error("Every contribution id must be unique.");
+  }
+
+  if (
+    content.contributions.some(
+      (item) => item.id === "opening" || item.id === "closing",
+    )
+  ) {
+    throw new Error(
+      'Contribution ids cannot use the reserved page ids "opening" or "closing".',
+    );
   }
 
   return [
@@ -53,7 +65,7 @@ export function buildPages(content: ScrapbookContent): ScrapbookPage[] {
 
 export function buildDesktopSpreads(
   pages: readonly ScrapbookPage[],
-): DesktopSpread[] {
+): readonly DesktopSpread[] {
   const opening = pages[0];
 
   if (!opening || opening.kind !== "opening") {
@@ -81,9 +93,25 @@ export function buildDesktopSpreads(
 }
 
 export function desktopSpreadForPageIndex(pageIndex: number): number {
+  assertNonNegativeSafeInteger(
+    pageIndex,
+    "Page index must be a non-negative safe integer.",
+  );
+
   return pageIndex === 0 ? 0 : Math.ceil(pageIndex / 2);
 }
 
 export function firstPageIndexForDesktopSpread(spreadIndex: number): number {
+  assertNonNegativeSafeInteger(
+    spreadIndex,
+    "Spread index must be a non-negative safe integer.",
+  );
+
   return spreadIndex === 0 ? 0 : spreadIndex * 2 - 1;
+}
+
+function assertNonNegativeSafeInteger(value: number, message: string): void {
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new RangeError(message);
+  }
 }
