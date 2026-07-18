@@ -33,6 +33,7 @@ export const tramTicket = {
     {
       photoIndex: 1,
       variant: "polaroid",
+      captionLayer: "lifted",
       placement: {
         desktop: {
           top: "28%",

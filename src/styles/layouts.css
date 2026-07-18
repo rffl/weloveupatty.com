@@ -124,6 +124,67 @@
     }
   }
 
+  .photo-frame--caption-lifted figcaption {
+    opacity: 0;
+  }
+
+  .contribution-piece--lifted-caption {
+    display: grid;
+    align-items: end;
+    min-height: 0;
+    padding: clamp(0.25rem, 1.2vw, 0.6rem);
+    container-name: lifted-caption;
+    container-type: size;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .contribution-lifted-caption__strip {
+    display: -webkit-box;
+    justify-self: center;
+    width: fit-content;
+    max-width: 100%;
+    padding: clamp(0.18rem, 2cqh, 0.32rem)
+      clamp(0.42rem, 3cqw, 0.72rem);
+    overflow: hidden;
+    color: var(--color-ink);
+    background:
+      repeating-linear-gradient(
+        4deg,
+        rgb(84 54 31 / 2%) 0 1px,
+        transparent 1px 7px
+      ),
+      var(--color-paper-light);
+    border: 1px solid rgb(82 55 34 / 12%);
+    box-shadow: var(--shadow-contact);
+    font-family: var(--font-hand);
+    font-size: clamp(0.78rem, 8cqh, 1rem);
+    font-weight: 600;
+    line-height: 1.05;
+    text-align: center;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .contribution-piece--lifted-caption-film
+    .contribution-lifted-caption__strip,
+  .contribution-piece--lifted-caption-photobooth
+    .contribution-lifted-caption__strip {
+    color: var(--color-paper-light);
+    background: #3a3734;
+    border-color: rgb(244 234 216 / 18%);
+  }
+
+  @container lifted-caption (max-height: 15rem) or (max-width: 17.5rem) {
+    .contribution-lifted-caption__strip {
+      padding: clamp(0.15rem, 1.5cqh, 0.25rem)
+        clamp(0.35rem, 2.5cqw, 0.58rem);
+      font-size: clamp(0.72rem, 8cqh, 0.9rem);
+    }
+  }
+
   .contribution-piece--message .openable-note {
     height: 100%;
   }
@@ -173,6 +234,14 @@
 
   .contribution-piece--decoration {
     pointer-events: none;
+  }
+
+  .contribution-piece--decoration.decoration--stamp {
+    min-width: 0;
+    min-height: 0;
+    padding: clamp(0.2rem, 1.5vw, 0.4rem);
+    font-size: clamp(0.48rem, 1.5vw, 0.65rem);
+    line-height: 1;
   }
 
   .contribution-layout[data-layout="torn-notebook"]::before,

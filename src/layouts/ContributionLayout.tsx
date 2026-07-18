@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { Fragment, useId } from "react";
 import type { CSSProperties } from "react";
 
 import { Decoration } from "../components/Decoration";
@@ -24,7 +24,10 @@ type PieceStyle = CSSProperties & {
   "--piece-z": number;
 };
 
-function pieceStyle(placement: PiecePlacement): PieceStyle {
+function pieceStyle(
+  placement: PiecePlacement,
+  z = placement.z ?? 1,
+): PieceStyle {
   const rotation = `${placement.rotate ?? 0}deg`;
 
   return {
@@ -36,7 +39,7 @@ function pieceStyle(placement: PiecePlacement): PieceStyle {
     height: placement.height,
     "--piece-rotation": rotation,
     "--rotation": rotation,
-    "--piece-z": placement.z ?? 1,
+    "--piece-z": z,
   };
 }
 
@@ -76,19 +79,45 @@ export function ContributionLayout({
       {recipe.photos.map((piece, index) => {
         const photo =
           contribution.photos[piece.photoIndex] ?? contribution.photos[0];
+        const placement = piece.placement[mode];
+        const liftedCaption =
+          piece.captionLayer === "lifted" ? photo.caption : undefined;
+        const captionZ =
+          Math.max(
+            placement.z ?? 1,
+            recipe.message.placement[mode].z ?? 1,
+          ) + 1;
 
         return (
-          <div
-            className="contribution-piece contribution-piece--photo"
-            key={`${contribution.id}-photo-${index}`}
-            style={pieceStyle(piece.placement[mode])}
-          >
-            <PhotoFrame
-              eager={eagerPhotos}
-              photo={photo}
-              variant={piece.variant}
-            />
-          </div>
+          <Fragment key={`${contribution.id}-photo-${index}`}>
+            <div
+              className="contribution-piece contribution-piece--photo"
+              style={pieceStyle(placement)}
+            >
+              <PhotoFrame
+                className={
+                  piece.captionLayer === "lifted"
+                    ? "photo-frame--caption-lifted"
+                    : undefined
+                }
+                eager={eagerPhotos}
+                photo={photo}
+                variant={piece.variant}
+              />
+            </div>
+
+            {liftedCaption ? (
+              <div
+                aria-hidden="true"
+                className={`contribution-piece contribution-piece--lifted-caption contribution-piece--lifted-caption-${piece.variant}`}
+                style={pieceStyle(placement, captionZ)}
+              >
+                <span className="contribution-lifted-caption__strip">
+                  {liftedCaption}
+                </span>
+              </div>
+            ) : null}
+          </Fragment>
         );
       })}
 

@@ -35,6 +35,7 @@ export type ResponsivePhotoPlacement = Readonly<{
 export type PhotoPiece = Readonly<{
   photoIndex: number;
   variant: PhotoFrameVariant;
+  captionLayer?: "lifted";
   placement: ResponsivePhotoPlacement;
 }>;
 
