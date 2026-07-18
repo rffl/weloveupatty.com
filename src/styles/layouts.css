@@ -185,6 +185,15 @@
     }
   }
 
+  @media (min-width: 900px) {
+    .contribution-layout[data-layout="postcard"]
+      .contribution-piece--lifted-caption-postcard
+      .contribution-lifted-caption__strip {
+      justify-self: start;
+      max-width: 40%;
+    }
+  }
+
   .contribution-piece--message .openable-note {
     height: 100%;
   }
