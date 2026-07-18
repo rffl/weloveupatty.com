@@ -185,6 +185,22 @@
     }
   }
 
+  .contribution-layout:is(
+      [data-layout="film-negative"],
+      [data-layout="sticky-notes"],
+      [data-layout="diary-entry"],
+      [data-layout="event-ticket"],
+      [data-layout="final-love-letter"]
+    )
+    .contribution-piece--lifted-caption {
+    align-items: start;
+  }
+
+  .contribution-layout[data-layout="diary-entry"]
+    .contribution-piece--lifted-caption {
+    padding-block-start: 0.1rem;
+  }
+
   @media (min-width: 900px) {
     .contribution-layout[data-layout="postcard"]
       .contribution-piece--lifted-caption-postcard
