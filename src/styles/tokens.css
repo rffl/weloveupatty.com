@@ -16,6 +16,6 @@
   --shadow-contact: 0 3px 6px rgb(49 30 19 / 22%);
   --shadow-lifted: 0 10px 18px rgb(42 23 13 / 28%);
   --shadow-book: 0 28px 48px rgb(21 10 6 / 46%);
-  --page-turn-duration: 520ms;
+  --page-turn-duration: 370ms;
   --page-turn-ease: cubic-bezier(0.22, 0.7, 0.2, 1);
 }

@@ -18,6 +18,7 @@ import { buildDesktopSpreads, buildPages } from "./pageModel";
 import { SpreadRenderer } from "./SpreadRenderer";
 import { useAdjacentImagePreload } from "./useAdjacentImagePreload";
 import { usePageTurner } from "./usePageTurner";
+import { useReducedMotion } from "./useReducedMotion";
 import { useResponsiveMode } from "./useResponsiveMode";
 
 type ScrapbookProps = {
@@ -39,7 +40,17 @@ export function Scrapbook({ content }: ScrapbookProps) {
   const mode = useResponsiveMode();
   const pages = useMemo(() => buildPages(content), [content]);
   const desktopSpreads = useMemo(() => buildDesktopSpreads(pages), [pages]);
-  const turner = usePageTurner({ pageCount: pages.length, mode });
+  const reducedMotion = useReducedMotion();
+  const turner = usePageTurner({
+    pageCount: pages.length,
+    mode,
+    reducedMotion,
+  });
+  const activeVisualTurn =
+    turner.turnState.phase === "idle" ? null : turner.turnState.turn;
+  const temporarilyVisiblePageIndex = activeVisualTurn
+    ? activeVisualTurn.destinationPageIndex
+    : turner.activePageIndex;
   const [coverPhase, setCoverPhase] = useState<CoverPhase>("closed");
   const coverPhaseRef = useRef<CoverPhase>("closed");
   const experienceRef = useRef<HTMLElement>(null);
@@ -240,7 +251,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
           role="group"
         >
           <div
-            aria-busy={turner.isTurning || undefined}
+            aria-busy={turner.isBusy || undefined}
             aria-hidden={!contentOpen}
             aria-label="Scrapbook pages"
             className="scrapbook-page-region"
@@ -253,16 +264,20 @@ export function Scrapbook({ content }: ScrapbookProps) {
             <PageTurner
               canNext={turner.canNext}
               canPrevious={turner.canPrevious}
-              direction={turner.turnDirection}
-              enabled={contentOpen}
-              isTurning={turner.isTurning}
+              direction={activeVisualTurn?.direction ?? null}
+              enabled={contentOpen && !turner.isBusy}
+              isTurning={turner.turnState.phase !== "idle"}
               onNext={requestNext}
               onPrevious={requestPrevious}
-              onTurnComplete={turner.completeTurn}
+              onTurnComplete={() => {
+                if (turner.turnState.phase === "settling") {
+                  turner.completeSettle(turner.turnState.turn.id);
+                }
+              }}
               outgoingContent={
-                turner.outgoingPageIndex === null ? null : (
+                activeVisualTurn ? (
                   <SpreadRenderer
-                    activePageIndex={turner.outgoingPageIndex}
+                    activePageIndex={activeVisualTurn.sourcePageIndex}
                     decorationLabels={content.recipeDecorationLabels}
                     desktopSpreads={desktopSpreads}
                     engagementEnabled={false}
@@ -270,15 +285,15 @@ export function Scrapbook({ content }: ScrapbookProps) {
                     onRememberPage={turner.rememberPage}
                     pages={pages}
                   />
-                )
+                ) : null
               }
               retainStationaryHalf={mode === "desktop"}
             >
               <SpreadRenderer
-                activePageIndex={turner.activePageIndex}
+                activePageIndex={temporarilyVisiblePageIndex}
                 decorationLabels={content.recipeDecorationLabels}
                 desktopSpreads={desktopSpreads}
-                engagementEnabled={contentOpen && !turner.isTurning}
+                engagementEnabled={contentOpen && !turner.isBusy}
                 mode={mode}
                 onRememberPage={turner.rememberPage}
                 pages={pages}
@@ -306,7 +321,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
             activeStep={turner.activeStep}
             canNext={turner.canNext}
             canPrevious={turner.canPrevious}
-            isTurning={turner.isTurning}
+            isTurning={turner.isBusy}
             onNext={requestNext}
             onPrevious={requestPrevious}
             totalSteps={turner.totalSteps}

@@ -7,127 +7,398 @@ import {
 } from "react";
 
 import type { ResponsiveMode } from "../layouts/types";
+import { desktopSpreadForPageIndex } from "./pageModel";
 import {
-  desktopSpreadForPageIndex,
-  firstPageIndexForDesktopSpread,
-} from "./pageModel";
+  adjacentPageIndex,
+  clampProgress,
+  fallbackDelayMs,
+  idlePageTurnState,
+  settleDurationMs,
+  shouldCommitSwipe,
+} from "./pageTurnMotion";
+import type {
+  GestureRelease,
+  PageTurnState,
+  PendingTurnIntent,
+  TurnDirection,
+  TurnInputSource,
+  TurnSettleTarget,
+  TurnSnapshot,
+} from "./pageTurnMotion";
 
-export type TurnDirection = "forward" | "backward";
+export type { TurnDirection, TurnSnapshot } from "./pageTurnMotion";
+
 export type PreviousAction =
   | "ignored"
   | "page-turn-started"
+  | "page-turn-queued"
   | "cover-closed";
-
-type ActiveTurn = {
-  id: number;
-  direction: TurnDirection;
-};
 
 type PageTurnerOptions = {
   pageCount: number;
   mode: ResponsiveMode;
+  reducedMotion: boolean;
 };
 
-const turnFallbackDelay = 800;
-
-export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
+export function usePageTurner({
+  pageCount,
+  mode,
+  reducedMotion,
+}: PageTurnerOptions) {
   const [coverOpen, setCoverOpen] = useState(false);
   const [activePageIndex, setActivePageIndex] = useState(0);
-  const [outgoingPageIndex, setOutgoingPageIndex] = useState<number | null>(
-    null,
-  );
-  const [activeTurn, setActiveTurn] = useState<ActiveTurn | null>(null);
+  const [turnState, setTurnState] =
+    useState<PageTurnState>(idlePageTurnState);
+  const [pendingIntent, setPendingIntent] =
+    useState<PendingTurnIntent | null>(null);
   const coverOpenRef = useRef(false);
   const activePageIndexRef = useRef(0);
-  const activeTurnId = useRef<number | null>(null);
+  const turnStateRef = useRef<PageTurnState>(idlePageTurnState);
+  const pendingIntentRef = useRef<PendingTurnIntent | null>(null);
+  const turnProgressRef = useRef(0);
   const nextTurnId = useRef(0);
-  const transitionTimer = useRef<number | null>(null);
+  const fallbackTimer = useRef<number | null>(null);
+  const pendingLaunchFrame = useRef<number | null>(null);
+  const resolveTurnRef = useRef<
+    (turnId: number, launchPending: boolean) => void
+  >(() => undefined);
+  const requestDirectionRef = useRef<
+    (direction: TurnDirection) => "ignored" | "started" | "queued"
+  >(() => "ignored");
   const previousMode = useRef(mode);
+  const previousReducedMotion = useRef(reducedMotion);
   const lastPageIndex = Math.max(0, pageCount - 1);
   const desktopSpreadCount = 1 + Math.ceil(Math.max(0, pageCount - 1) / 2);
 
-  const finishTurn = useCallback((turnId: number) => {
-    if (activeTurnId.current !== turnId) {
-      return;
-    }
-
-    activeTurnId.current = null;
-
-    if (transitionTimer.current !== null) {
-      window.clearTimeout(transitionTimer.current);
-      transitionTimer.current = null;
-    }
-
-    setActiveTurn((current) => (current?.id === turnId ? null : current));
-    setOutgoingPageIndex(null);
+  const publishTurnState = useCallback((nextState: PageTurnState) => {
+    turnStateRef.current = nextState;
+    setTurnState(nextState);
   }, []);
 
-  const completeTurn = useCallback(() => {
-    const turnId = activeTurnId.current;
+  const publishPendingIntent = useCallback(
+    (intent: PendingTurnIntent | null) => {
+      pendingIntentRef.current = intent;
+      setPendingIntent(intent);
+    },
+    [],
+  );
 
-    if (turnId !== null) {
-      finishTurn(turnId);
+  const clearFallback = useCallback(() => {
+    if (fallbackTimer.current !== null) {
+      window.clearTimeout(fallbackTimer.current);
+      fallbackTimer.current = null;
     }
-  }, [finishTurn]);
+  }, []);
 
-  useLayoutEffect(() => {
-    if (previousMode.current === mode) {
-      return;
+  const clearPendingLaunch = useCallback(() => {
+    if (pendingLaunchFrame.current !== null) {
+      window.cancelAnimationFrame(pendingLaunchFrame.current);
+      pendingLaunchFrame.current = null;
+    }
+  }, []);
+
+  const commitPageIndex = useCallback((pageIndex: number) => {
+    activePageIndexRef.current = pageIndex;
+    setActivePageIndex(pageIndex);
+  }, []);
+
+  const armFallback = useCallback(
+    (turnId: number, durationMs: number) => {
+      clearFallback();
+      fallbackTimer.current = window.setTimeout(() => {
+        resolveTurnRef.current(turnId, true);
+      }, fallbackDelayMs(durationMs));
+    },
+    [clearFallback],
+  );
+
+  const beginAutomaticTurn = useCallback(
+    (
+      sourcePageIndex: number,
+      destinationPageIndex: number,
+      direction: TurnDirection,
+    ) => {
+      const turn: TurnSnapshot = {
+        id: nextTurnId.current + 1,
+        direction,
+        sourcePageIndex,
+        destinationPageIndex,
+        canCommit: true,
+        mode,
+      };
+      nextTurnId.current = turn.id;
+
+      const durationMs = settleDurationMs({
+        source: "automatic",
+        settleTarget: "destination",
+        startProgress: 0,
+        velocityPxPerMs: 0,
+        reducedMotion,
+      });
+      turnProgressRef.current = 0;
+      publishTurnState({
+        phase: "settling",
+        turn,
+        settleTarget: "destination",
+        startProgress: 0,
+        durationMs,
+      });
+      armFallback(turn.id, durationMs);
+    },
+    [armFallback, mode, publishTurnState, reducedMotion],
+  );
+
+  const adjacentFrom = useCallback(
+    (pageIndex: number, direction: TurnDirection) =>
+      adjacentPageIndex({
+        currentPageIndex: pageIndex,
+        direction,
+        mode,
+        pageCount,
+      }),
+    [mode, pageCount],
+  );
+
+  const projectedBaseIndex = useCallback(() => {
+    const current = turnStateRef.current;
+
+    if (current.phase === "idle") {
+      return activePageIndexRef.current;
     }
 
-    previousMode.current = mode;
-
-    const turnId = activeTurnId.current;
-
-    if (turnId !== null) {
-      finishTurn(turnId);
+    if (
+      current.phase === "settling" &&
+      current.settleTarget === "destination"
+    ) {
+      return current.turn.destinationPageIndex;
     }
-  }, [finishTurn, mode]);
 
-  useLayoutEffect(() => {
-    const nextIndex = Math.min(activePageIndexRef.current, lastPageIndex);
+    return current.turn.sourcePageIndex;
+  }, []);
 
-    if (nextIndex !== activePageIndexRef.current) {
-      activePageIndexRef.current = nextIndex;
-      setActivePageIndex(nextIndex);
-    }
-  }, [lastPageIndex]);
-
-  useEffect(() => {
-    return () => {
-      if (transitionTimer.current !== null) {
-        window.clearTimeout(transitionTimer.current);
-        transitionTimer.current = null;
+  const queueDirection = useCallback(
+    (direction: TurnDirection): "ignored" | "queued" => {
+      if (turnStateRef.current.phase === "dragging") {
+        return "ignored";
       }
 
-      activeTurnId.current = null;
-    };
-  }, []);
+      const targetPageIndex = adjacentFrom(projectedBaseIndex(), direction);
 
-  const navigateToPage = useCallback(
-    (target: number, direction: TurnDirection) => {
-      const nextIndex = Math.max(0, Math.min(lastPageIndex, target));
+      if (targetPageIndex === null) {
+        return "ignored";
+      }
+
+      publishPendingIntent({ direction, targetPageIndex });
+      return "queued";
+    },
+    [adjacentFrom, projectedBaseIndex, publishPendingIntent],
+  );
+
+  const requestDirection = useCallback(
+    (direction: TurnDirection): "ignored" | "started" | "queued" => {
+      if (
+        turnStateRef.current.phase !== "idle" ||
+        pendingIntentRef.current !== null
+      ) {
+        return queueDirection(direction);
+      }
+
+      const sourcePageIndex = activePageIndexRef.current;
+      const destinationPageIndex = adjacentFrom(sourcePageIndex, direction);
+
+      if (destinationPageIndex === null) {
+        return "ignored";
+      }
+
+      beginAutomaticTurn(sourcePageIndex, destinationPageIndex, direction);
+      return "started";
+    },
+    [adjacentFrom, beginAutomaticTurn, queueDirection],
+  );
+
+  useLayoutEffect(() => {
+    requestDirectionRef.current = requestDirection;
+  }, [requestDirection]);
+
+  const beginDrag = useCallback(
+    (direction: TurnDirection): TurnSnapshot | null => {
+      if (
+        !coverOpenRef.current ||
+        turnStateRef.current.phase !== "idle" ||
+        pendingIntentRef.current !== null
+      ) {
+        return null;
+      }
+
+      const sourcePageIndex = activePageIndexRef.current;
+      const destinationPageIndex = adjacentFrom(sourcePageIndex, direction);
 
       if (
-        activeTurnId.current !== null ||
-        nextIndex === activePageIndexRef.current
+        destinationPageIndex === null &&
+        direction === "backward" &&
+        sourcePageIndex === 0
       ) {
+        return null;
+      }
+
+      const turn: TurnSnapshot = {
+        id: nextTurnId.current + 1,
+        direction,
+        sourcePageIndex,
+        destinationPageIndex: destinationPageIndex ?? sourcePageIndex,
+        canCommit: destinationPageIndex !== null,
+        mode,
+      };
+      nextTurnId.current = turn.id;
+      turnProgressRef.current = 0;
+      publishTurnState({ phase: "dragging", turn });
+      return turn;
+    },
+    [adjacentFrom, mode, publishTurnState],
+  );
+
+  const updateDrag = useCallback((turnId: number, progress: number) => {
+    const current = turnStateRef.current;
+
+    if (current.phase === "dragging" && current.turn.id === turnId) {
+      turnProgressRef.current = clampProgress(progress);
+    }
+  }, []);
+
+  const settleDrag = useCallback(
+    (
+      release: GestureRelease,
+      settleTarget: TurnSettleTarget,
+      source: TurnInputSource = "gesture",
+    ) => {
+      const current = turnStateRef.current;
+
+      if (current.phase !== "dragging" || current.turn.id !== release.turnId) {
         return;
       }
 
-      const turnId = nextTurnId.current + 1;
-      nextTurnId.current = turnId;
-      activeTurnId.current = turnId;
-      setOutgoingPageIndex(activePageIndexRef.current);
-      activePageIndexRef.current = nextIndex;
-      setActiveTurn({ id: turnId, direction });
-      setActivePageIndex(nextIndex);
-      transitionTimer.current = window.setTimeout(() => {
-        finishTurn(turnId);
-      }, turnFallbackDelay);
+      const resolvedTarget =
+        settleTarget === "destination" && !current.turn.canCommit
+          ? "source"
+          : settleTarget;
+      const startProgress = clampProgress(release.progress);
+      const durationMs = settleDurationMs({
+        source,
+        settleTarget: resolvedTarget,
+        startProgress,
+        velocityPxPerMs: release.velocityTowardDirectionPxPerMs,
+        reducedMotion,
+      });
+      turnProgressRef.current = startProgress;
+      publishTurnState({
+        phase: "settling",
+        turn: current.turn,
+        settleTarget: resolvedTarget,
+        startProgress,
+        durationMs,
+      });
+      armFallback(current.turn.id, durationMs);
     },
-    [finishTurn, lastPageIndex],
+    [armFallback, publishTurnState, reducedMotion],
   );
+
+  const releaseDrag = useCallback(
+    (release: GestureRelease) => {
+      settleDrag(
+        release,
+        shouldCommitSwipe(release) ? "destination" : "source",
+      );
+    },
+    [settleDrag],
+  );
+
+  const cancelDrag = useCallback(
+    (turnId: number, progress = turnProgressRef.current) => {
+      settleDrag(
+        {
+          turnId,
+          progress,
+          distanceTowardDirectionPx: 0,
+          velocityTowardDirectionPxPerMs: 0,
+          horizontalDominant: false,
+        },
+        "source",
+      );
+    },
+    [settleDrag],
+  );
+
+  const resolveTurn = useCallback(
+    (turnId: number, launchPending: boolean) => {
+      const current = turnStateRef.current;
+
+      if (current.phase === "idle" || current.turn.id !== turnId) {
+        return;
+      }
+
+      clearFallback();
+      clearPendingLaunch();
+
+      const landedPageIndex =
+        current.phase === "settling" &&
+        current.settleTarget === "destination"
+          ? current.turn.destinationPageIndex
+          : current.turn.sourcePageIndex;
+      commitPageIndex(landedPageIndex);
+      turnProgressRef.current = 0;
+      publishTurnState(idlePageTurnState);
+
+      if (!launchPending) {
+        publishPendingIntent(null);
+        return;
+      }
+
+      if (pendingIntentRef.current === null) {
+        publishPendingIntent(null);
+        return;
+      }
+
+      pendingLaunchFrame.current = window.requestAnimationFrame(() => {
+        pendingLaunchFrame.current = null;
+        const nextIntent = pendingIntentRef.current;
+        publishPendingIntent(null);
+
+        if (nextIntent) {
+          requestDirectionRef.current(nextIntent.direction);
+        }
+      });
+    },
+    [
+      clearFallback,
+      clearPendingLaunch,
+      commitPageIndex,
+      publishPendingIntent,
+      publishTurnState,
+    ],
+  );
+
+  useLayoutEffect(() => {
+    resolveTurnRef.current = resolveTurn;
+  }, [resolveTurn]);
+
+  const completeSettle = useCallback((turnId: number) => {
+    const current = turnStateRef.current;
+
+    if (current.phase === "settling" && current.turn.id === turnId) {
+      resolveTurnRef.current(turnId, true);
+    }
+  }, []);
+
+  const resolveForLayoutChange = useCallback(() => {
+    const current = turnStateRef.current;
+
+    clearPendingLaunch();
+    publishPendingIntent(null);
+
+    if (current.phase !== "idle") {
+      resolveTurnRef.current(current.turn.id, false);
+    }
+  }, [clearPendingLaunch, publishPendingIntent]);
 
   const openCover = useCallback(() => {
     coverOpenRef.current = true;
@@ -140,27 +411,21 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
       return;
     }
 
-    if (activeTurnId.current !== null) {
-      return;
-    }
-
-    if (mode === "mobile") {
-      navigateToPage(activePageIndexRef.current + 1, "forward");
-      return;
-    }
-
-    const spread = desktopSpreadForPageIndex(activePageIndexRef.current);
-
-    if (spread >= desktopSpreadCount - 1) {
-      return;
-    }
-
-    navigateToPage(firstPageIndexForDesktopSpread(spread + 1), "forward");
-  }, [desktopSpreadCount, mode, navigateToPage, openCover]);
+    requestDirection("forward");
+  }, [openCover, requestDirection]);
 
   const previous = useCallback((): PreviousAction => {
-    if (!coverOpenRef.current || activeTurnId.current !== null) {
+    if (!coverOpenRef.current) {
       return "ignored";
+    }
+
+    if (
+      turnStateRef.current.phase !== "idle" ||
+      pendingIntentRef.current !== null
+    ) {
+      return requestDirection("backward") === "queued"
+        ? "page-turn-queued"
+        : "ignored";
     }
 
     if (activePageIndexRef.current === 0) {
@@ -169,71 +434,130 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
       return "cover-closed";
     }
 
-    if (mode === "mobile") {
-      navigateToPage(activePageIndexRef.current - 1, "backward");
-      return "page-turn-started";
-    }
-
-    const spread = desktopSpreadForPageIndex(activePageIndexRef.current);
-    navigateToPage(firstPageIndexForDesktopSpread(spread - 1), "backward");
-    return "page-turn-started";
-  }, [mode, navigateToPage]);
+    return requestDirection("backward") === "started"
+      ? "page-turn-started"
+      : "ignored";
+  }, [requestDirection]);
 
   const goToPage = useCallback(
     (pageIndex: number) => {
-      navigateToPage(
-        pageIndex,
-        pageIndex >= activePageIndexRef.current ? "forward" : "backward",
+      if (
+        turnStateRef.current.phase !== "idle" ||
+        pendingIntentRef.current !== null
+      ) {
+        return;
+      }
+
+      const target = Math.max(0, Math.min(lastPageIndex, pageIndex));
+      const source = activePageIndexRef.current;
+
+      if (target === source) {
+        return;
+      }
+
+      if (
+        mode === "desktop" &&
+        desktopSpreadForPageIndex(target) === desktopSpreadForPageIndex(source)
+      ) {
+        commitPageIndex(target);
+        return;
+      }
+
+      beginAutomaticTurn(
+        source,
+        target,
+        target > source ? "forward" : "backward",
       );
     },
-    [navigateToPage],
+    [beginAutomaticTurn, commitPageIndex, lastPageIndex, mode],
   );
 
   const rememberPage = useCallback(
     (pageIndex: number) => {
+      if (
+        turnStateRef.current.phase !== "idle" ||
+        pendingIntentRef.current !== null
+      ) {
+        return;
+      }
+
       const nextIndex = Math.max(0, Math.min(lastPageIndex, pageIndex));
 
-      if (activeTurnId.current !== null) {
-        return;
+      if (nextIndex !== activePageIndexRef.current) {
+        commitPageIndex(nextIndex);
       }
-
-      if (nextIndex === activePageIndexRef.current) {
-        return;
-      }
-
-      activePageIndexRef.current = nextIndex;
-      setActivePageIndex(nextIndex);
     },
-    [lastPageIndex],
+    [commitPageIndex, lastPageIndex],
   );
+
+  useLayoutEffect(() => {
+    const modeChanged = previousMode.current !== mode;
+    const motionChanged = previousReducedMotion.current !== reducedMotion;
+    previousMode.current = mode;
+    previousReducedMotion.current = reducedMotion;
+
+    if (modeChanged || motionChanged) {
+      resolveForLayoutChange();
+    }
+  }, [mode, reducedMotion, resolveForLayoutChange]);
+
+  useLayoutEffect(() => {
+    resolveForLayoutChange();
+
+    const nextIndex = Math.min(activePageIndexRef.current, lastPageIndex);
+
+    if (nextIndex !== activePageIndexRef.current) {
+      commitPageIndex(nextIndex);
+    }
+  }, [commitPageIndex, lastPageIndex, resolveForLayoutChange]);
+
+  useEffect(() => {
+    return () => {
+      clearFallback();
+      clearPendingLaunch();
+      pendingIntentRef.current = null;
+      turnStateRef.current = idlePageTurnState;
+    };
+  }, [clearFallback, clearPendingLaunch]);
 
   useLayoutEffect(() => {
     coverOpenRef.current = coverOpen;
   }, [coverOpen]);
 
+  const navigationBaseIndex = projectedBaseIndex();
+  const canNext =
+    coverOpen && adjacentFrom(navigationBaseIndex, "forward") !== null;
+  const canPrevious =
+    coverOpen &&
+    (turnState.phase === "idle"
+      ? true
+      : adjacentFrom(navigationBaseIndex, "backward") !== null);
   const activeStep =
     mode === "desktop"
       ? desktopSpreadForPageIndex(activePageIndex)
       : activePageIndex;
   const totalSteps = mode === "desktop" ? desktopSpreadCount : pageCount;
-  const canNext =
-    coverOpen &&
-    (mode === "desktop"
-      ? activeStep < desktopSpreadCount - 1
-      : activePageIndex < lastPageIndex);
+  const isBusy = turnState.phase !== "idle" || pendingIntent !== null;
 
   return {
     coverOpen,
     openCover,
     activePageIndex,
-    outgoingPageIndex,
     activeStep,
     totalSteps,
-    turnDirection: activeTurn?.direction ?? null,
-    isTurning: activeTurn !== null,
-    canPrevious: coverOpen,
+    turnState,
+    pendingIntent,
+    isBusy,
+    isDragging: turnState.phase === "dragging",
+    isSettling: turnState.phase === "settling",
+    canPrevious,
     canNext,
-    completeTurn,
+    beginDrag,
+    updateDrag,
+    releaseDrag,
+    cancelDrag,
+    completeSettle,
+    resolveForLayoutChange,
     next,
     previous,
     goToPage,
