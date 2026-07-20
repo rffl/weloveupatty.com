@@ -21,7 +21,7 @@ type PageTurnerProps = {
 
 type DragStyle = CSSProperties & { "--drag-offset": string };
 
-const minimumPageEdge = 36;
+const minimumPageEdge = 44;
 
 export function PageTurner({
   children,

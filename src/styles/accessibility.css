@@ -16,6 +16,11 @@
   box-shadow: 0 0 0 10px var(--color-tram-blue);
 }
 
+::selection {
+  color: var(--color-ink);
+  background: rgb(209 160 76 / 48%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -93,6 +98,8 @@
       clamp(1.75rem, 6vw, 3.5rem);
     overflow-y: auto;
     overscroll-behavior: contain;
+    cursor: text;
+    user-select: text;
   }
 
   .reading-view__detail {
@@ -120,5 +127,36 @@
     line-height: 1.35;
     overflow-wrap: anywhere;
     white-space: pre-wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .reading-view {
+    width: min(94vw, 42rem);
+    max-height: 90dvh;
+  }
+
+  .reading-view__paper {
+    max-height: 90dvh;
+    transform: rotate(-0.25deg);
+  }
+
+  .reading-view__content {
+    padding: 0.25rem 1.15rem 1.45rem;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .openable-note,
+  .photo-frame,
+  .scrapbook-control {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  :focus-visible {
+    outline-width: 4px;
+    outline-color: var(--color-paper-light);
+    outline-offset: 4px;
   }
 }

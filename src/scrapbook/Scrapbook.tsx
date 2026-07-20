@@ -16,6 +16,7 @@ import type { ScrapbookContent } from "../content/types";
 import { PageTurner } from "./PageTurner";
 import { buildDesktopSpreads, buildPages } from "./pageModel";
 import { SpreadRenderer } from "./SpreadRenderer";
+import { useAdjacentImagePreload } from "./useAdjacentImagePreload";
 import { usePageTurner } from "./usePageTurner";
 import { useResponsiveMode } from "./useResponsiveMode";
 
@@ -47,6 +48,13 @@ export function Scrapbook({ content }: ScrapbookProps) {
   const focusContentAfterOpening = useRef(false);
   const focusCoverAfterClosing = useRef(false);
   const keyboardActions = useRef<KeyboardActions | null>(null);
+
+  useAdjacentImagePreload(
+    pages,
+    turner.activePageIndex,
+    mode === "desktop" ? 3 : 2,
+    coverPhase === "opening" || coverPhase === "open",
+  );
 
   const updateCoverPhase = useCallback((phase: CoverPhase) => {
     coverPhaseRef.current = phase;
