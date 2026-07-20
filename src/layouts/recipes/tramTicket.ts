@@ -5,7 +5,7 @@ export const tramTicket = {
   surface: "graph",
   namePlacement: {
     desktop: { top: "6%", left: "8%", width: "42%", rotate: -3, z: 8 },
-    mobile: { top: "5%", left: "7%", width: "60%", rotate: -3, z: 8 },
+    mobile: { top: "4%", left: "7%", width: "60%", rotate: -3, z: 8 },
   },
   photos: [
     {
@@ -21,10 +21,10 @@ export const tramTicket = {
           z: 5,
         },
         mobile: {
-          top: "16%",
+          top: "18%",
           right: "5%",
           width: "62%",
-          height: "30%",
+          height: "23%",
           rotate: 6,
           z: 5,
         },
@@ -44,10 +44,10 @@ export const tramTicket = {
           z: 6,
         },
         mobile: {
-          top: "28%",
+          top: "36%",
           left: "5%",
           width: "46%",
-          height: "26%",
+          height: "20%",
           rotate: -7,
           z: 6,
         },
@@ -69,7 +69,7 @@ export const tramTicket = {
         bottom: "8%",
         left: "8%",
         width: "84%",
-        height: "39%",
+        height: "30%",
         rotate: 1,
         z: 7,
       },
@@ -89,10 +89,10 @@ export const tramTicket = {
           z: 9,
         },
         mobile: {
-          top: "11%",
+          top: "13%",
           right: "3%",
           width: "43%",
-          height: "10%",
+          height: "8%",
           rotate: -4,
           z: 9,
         },
