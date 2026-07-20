@@ -351,6 +351,10 @@ export function PageTurner({
     const x = event.clientX - bounds.left;
     const y = event.clientY - bounds.top;
 
+    if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
+      return;
+    }
+
     if (y < verticalInset || y > bounds.height - verticalInset) {
       return;
     }
