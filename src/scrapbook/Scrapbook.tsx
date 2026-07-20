@@ -46,11 +46,8 @@ export function Scrapbook({ content }: ScrapbookProps) {
     mode,
     reducedMotion,
   });
-  const activeVisualTurn =
+  const visualTurn =
     turner.turnState.phase === "idle" ? null : turner.turnState.turn;
-  const temporarilyVisiblePageIndex = activeVisualTurn
-    ? activeVisualTurn.destinationPageIndex
-    : turner.activePageIndex;
   const [coverPhase, setCoverPhase] = useState<CoverPhase>("closed");
   const coverPhaseRef = useRef<CoverPhase>("closed");
   const experienceRef = useRef<HTMLElement>(null);
@@ -138,6 +135,28 @@ export function Scrapbook({ content }: ScrapbookProps) {
   );
 
   const contentOpen = coverPhase === "open" && turner.coverOpen;
+  const sourceContent = visualTurn ? (
+    <SpreadRenderer
+      activePageIndex={visualTurn.sourcePageIndex}
+      decorationLabels={content.recipeDecorationLabels}
+      desktopSpreads={desktopSpreads}
+      engagementEnabled={false}
+      mode={mode}
+      onRememberPage={turner.rememberPage}
+      pages={pages}
+    />
+  ) : null;
+  const destinationContent = visualTurn ? (
+    <SpreadRenderer
+      activePageIndex={visualTurn.destinationPageIndex}
+      decorationLabels={content.recipeDecorationLabels}
+      desktopSpreads={desktopSpreads}
+      engagementEnabled={false}
+      mode={mode}
+      onRememberPage={turner.rememberPage}
+      pages={pages}
+    />
+  ) : null;
 
   useLayoutEffect(() => {
     if (coverPhase === "open" && focusContentAfterOpening.current) {
@@ -264,33 +283,24 @@ export function Scrapbook({ content }: ScrapbookProps) {
             <PageTurner
               canNext={turner.canNext}
               canPrevious={turner.canPrevious}
-              direction={activeVisualTurn?.direction ?? null}
-              enabled={contentOpen && !turner.isBusy}
-              isTurning={turner.turnState.phase !== "idle"}
+              destinationContent={destinationContent}
+              enabled={contentOpen}
+              isBusy={turner.isBusy}
+              mode={mode}
+              onDragCancel={turner.cancelDrag}
+              onDragProgress={turner.updateDrag}
+              onDragRelease={turner.releaseDrag}
+              onDragStart={turner.beginDrag}
+              onLayoutChange={turner.resolveForLayoutChange}
               onNext={requestNext}
               onPrevious={requestPrevious}
-              onTurnComplete={() => {
-                if (turner.turnState.phase === "settling") {
-                  turner.completeSettle(turner.turnState.turn.id);
-                }
-              }}
-              outgoingContent={
-                activeVisualTurn ? (
-                  <SpreadRenderer
-                    activePageIndex={activeVisualTurn.sourcePageIndex}
-                    decorationLabels={content.recipeDecorationLabels}
-                    desktopSpreads={desktopSpreads}
-                    engagementEnabled={false}
-                    mode={mode}
-                    onRememberPage={turner.rememberPage}
-                    pages={pages}
-                  />
-                ) : null
-              }
-              retainStationaryHalf={mode === "desktop"}
+              onTurnComplete={turner.completeSettle}
+              reducedMotion={reducedMotion}
+              sourceContent={sourceContent}
+              turnState={turner.turnState}
             >
               <SpreadRenderer
-                activePageIndex={temporarilyVisiblePageIndex}
+                activePageIndex={turner.activePageIndex}
                 decorationLabels={content.recipeDecorationLabels}
                 desktopSpreads={desktopSpreads}
                 engagementEnabled={contentOpen && !turner.isBusy}

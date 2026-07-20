@@ -1,73 +1,325 @@
-import { useLayoutEffect, useRef } from "react";
-import type { CSSProperties, MouseEventHandler, ReactNode } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 
-import type { TurnDirection } from "./usePageTurner";
-import { desktopMediaQuery } from "./useResponsiveMode";
+import type { ResponsiveMode } from "../layouts/types";
+import {
+  turnAngleDegrees,
+  turnDepth,
+  turnEasing,
+} from "./pageTurnMotion";
+import type {
+  GestureRelease,
+  PageTurnState,
+  TurnDirection,
+  TurnSnapshot,
+} from "./pageTurnMotion";
 import { isInteractiveTarget, useSwipeGesture } from "./useSwipeGesture";
 
 type PageTurnerProps = {
   children: ReactNode;
-  outgoingContent: ReactNode | null;
-  retainStationaryHalf: boolean;
+  sourceContent: ReactNode | null;
+  destinationContent: ReactNode | null;
+  mode: ResponsiveMode;
+  reducedMotion: boolean;
   enabled: boolean;
-  isTurning: boolean;
-  direction: TurnDirection | null;
+  isBusy: boolean;
+  turnState: PageTurnState;
   canPrevious: boolean;
   canNext: boolean;
   onPrevious: () => void;
   onNext: () => void;
-  onTurnComplete: () => void;
+  onDragStart: (direction: TurnDirection) => TurnSnapshot | null;
+  onDragProgress: (turnId: number, progress: number) => void;
+  onDragRelease: (release: GestureRelease) => void;
+  onDragCancel: (turnId: number, progress: number) => void;
+  onTurnComplete: (turnId: number) => void;
+  onLayoutChange: () => void;
 };
-
-type DragStyle = CSSProperties & { "--drag-offset": string };
-
-const minimumPageEdge = 44;
 
 export function PageTurner({
   children,
-  outgoingContent,
-  retainStationaryHalf,
+  sourceContent,
+  destinationContent,
+  mode,
+  reducedMotion,
   enabled,
-  isTurning,
-  direction,
+  isBusy,
+  turnState,
   canPrevious,
   canNext,
   onPrevious,
   onNext,
+  onDragStart,
+  onDragProgress,
+  onDragRelease,
+  onDragCancel,
   onTurnComplete,
 }: PageTurnerProps) {
-  const turningLeaf = useRef<HTMLDivElement>(null);
-  const { dragOffset, isDragging, consumeClickSuppression, gestureProps } =
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const leafRef = useRef<HTMLDivElement>(null);
+  const castShadowRef = useRef<HTMLSpanElement>(null);
+  const edgeRef = useRef<HTMLSpanElement>(null);
+  const shadingRef = useRef<HTMLSpanElement>(null);
+  const gutterShadeRef = useRef<HTMLSpanElement>(null);
+  const destinationRef = useRef<HTMLDivElement>(null);
+  const visualProgress = useRef(0);
+  const gestureDirection = useRef<TurnDirection | null>(null);
+  const visualFrame = useRef<number | null>(null);
+  const pendingVisual = useRef<{
+    progress: number;
+    direction: TurnDirection;
+  } | null>(null);
+  const runningAnimations = useRef<Animation[]>([]);
+
+  const applyProgress = useCallback(
+    (progress: number, direction: TurnDirection) => {
+      visualProgress.current = progress;
+
+      if (reducedMotion) {
+        return;
+      }
+
+      const leaf = leafRef.current;
+      const castShadow = castShadowRef.current;
+      const edge = edgeRef.current;
+      const shading = shadingRef.current;
+      const gutterShade = gutterShadeRef.current;
+      const angle = turnAngleDegrees({ mode, direction, progress });
+      const depth = turnDepth(progress);
+
+      if (leaf) {
+        leaf.style.transform = `rotateY(${angle}deg)`;
+      }
+      if (castShadow) {
+        castShadow.style.opacity = `${depth * 0.48}`;
+        castShadow.style.transform = `scaleX(${0.24 + depth * 0.76})`;
+      }
+      if (edge) {
+        edge.style.opacity = `${depth * 0.82}`;
+      }
+      if (shading) {
+        shading.style.opacity = `${0.16 + depth * 0.46}`;
+        shading.style.transform =
+          `translateZ(0.4px) scaleX(${0.78 + depth * 0.22})`;
+      }
+      if (gutterShade) {
+        gutterShade.style.opacity = `${depth * 0.42}`;
+        gutterShade.style.transform = `scaleX(${0.35 + depth * 0.65})`;
+      }
+    },
+    [mode, reducedMotion],
+  );
+
+  const scheduleProgress = useCallback(
+    (progress: number, direction: TurnDirection) => {
+      visualProgress.current = progress;
+      pendingVisual.current = { progress, direction };
+
+      if (visualFrame.current !== null) {
+        return;
+      }
+
+      visualFrame.current = window.requestAnimationFrame(() => {
+        visualFrame.current = null;
+        const nextVisual = pendingVisual.current;
+        pendingVisual.current = null;
+
+        if (nextVisual) {
+          applyProgress(nextVisual.progress, nextVisual.direction);
+        }
+      });
+    },
+    [applyProgress],
+  );
+
+  useLayoutEffect(() => {
+    return () => {
+      if (visualFrame.current !== null) {
+        window.cancelAnimationFrame(visualFrame.current);
+      }
+      runningAnimations.current.forEach((animation) => animation.cancel());
+      visualFrame.current = null;
+      pendingVisual.current = null;
+      runningAnimations.current = [];
+    };
+  }, []);
+
+  const { isTracking, consumeClickSuppression, gestureProps } =
     useSwipeGesture({
-      enabled: enabled && !isTurning,
+      enabled,
+      directManipulationEnabled: turnState.phase === "idle",
+      onDragStart: (direction) => {
+        const turn = onDragStart(direction);
+
+        if (turn) {
+          gestureDirection.current = direction;
+        }
+
+        return turn;
+      },
+      onDragProgress: (turnId, progress) => {
+        visualProgress.current = progress;
+        onDragProgress(turnId, progress);
+
+        const direction =
+          turnState.phase === "idle"
+            ? gestureDirection.current
+            : turnState.turn.direction;
+
+        if (direction) {
+          scheduleProgress(progress, direction);
+        }
+      },
+      onDragRelease,
+      onDragCancel,
       onSwipeLeft: onNext,
       onSwipeRight: onPrevious,
     });
-  const style: DragStyle = { "--drag-offset": `${dragOffset}px` };
 
   useLayoutEffect(() => {
-    const leaf = turningLeaf.current;
+    if (visualFrame.current !== null) {
+      window.cancelAnimationFrame(visualFrame.current);
+      visualFrame.current = null;
+      pendingVisual.current = null;
+    }
 
-    if (!leaf || !isTurning) {
+    runningAnimations.current.forEach((animation) => animation.cancel());
+    runningAnimations.current = [];
+
+    if (turnState.phase !== "settling") {
       return;
     }
 
+    const { turn, settleTarget, startProgress, durationMs } = turnState;
+    const destinationProgress = settleTarget === "destination" ? 1 : 0;
     let completed = false;
-    const complete = (event: AnimationEvent) => {
-      if (!completed && event.target === leaf) {
+
+    const complete = () => {
+      if (!completed) {
         completed = true;
-        onTurnComplete();
+        onTurnComplete(turn.id);
       }
     };
 
-    leaf.addEventListener("animationend", complete);
-    leaf.addEventListener("animationcancel", complete);
+    if (reducedMotion) {
+      if (settleTarget === "source") {
+        const frame = window.requestAnimationFrame(complete);
+        return () => window.cancelAnimationFrame(frame);
+      }
+
+      const destination = destinationRef.current;
+
+      if (!destination) {
+        complete();
+        return;
+      }
+
+      const animation = destination.animate(
+        [
+          { opacity: 0, transform: "translateY(1px) scale(0.996)" },
+          { opacity: 1, transform: "translateY(0) scale(1)" },
+        ],
+        { duration: durationMs, easing: "ease-out", fill: "forwards" },
+      );
+      runningAnimations.current = [animation];
+      animation.finished.then(complete).catch(() => undefined);
+      return () => {
+        animation.cancel();
+        runningAnimations.current = [];
+      };
+    }
+
+    if (Math.abs(destinationProgress - startProgress) < 0.001) {
+      applyProgress(destinationProgress, turn.direction);
+      const frame = window.requestAnimationFrame(complete);
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    const leaf = leafRef.current;
+    const castShadow = castShadowRef.current;
+    const edge = edgeRef.current;
+    const shading = shadingRef.current;
+    const gutterShade = gutterShadeRef.current;
+
+    if (!leaf || !castShadow || !edge || !shading || !gutterShade) {
+      complete();
+      return;
+    }
+
+    const progressStops = [startProgress];
+    const crossesMidpoint =
+      (startProgress < 0.5 && destinationProgress > 0.5) ||
+      (startProgress > 0.5 && destinationProgress < 0.5);
+
+    if (crossesMidpoint) {
+      progressStops.push(0.5);
+    }
+    progressStops.push(destinationProgress);
+
+    const offsetFor = (progress: number) => {
+      const distance = Math.abs(destinationProgress - startProgress);
+      return distance === 0
+        ? 1
+        : Math.abs(progress - startProgress) / distance;
+    };
+    const leafFrames = progressStops.map((progress) => ({
+      offset: offsetFor(progress),
+      transform: `rotateY(${turnAngleDegrees({
+        mode,
+        direction: turn.direction,
+        progress,
+      })}deg)`,
+    }));
+    const depthFrames = progressStops.map((progress) => ({
+      offset: offsetFor(progress),
+      opacity: turnDepth(progress) * 0.48,
+      transform: `scaleX(${0.24 + turnDepth(progress) * 0.76})`,
+    }));
+    const edgeFrames = progressStops.map((progress) => ({
+      offset: offsetFor(progress),
+      opacity: turnDepth(progress) * 0.82,
+    }));
+    const shadingFrames = progressStops.map((progress) => ({
+      offset: offsetFor(progress),
+      opacity: 0.16 + turnDepth(progress) * 0.46,
+      transform:
+        `translateZ(0.4px) scaleX(${0.78 + turnDepth(progress) * 0.22})`,
+    }));
+    const gutterFrames = progressStops.map((progress) => ({
+      offset: offsetFor(progress),
+      opacity: turnDepth(progress) * 0.42,
+      transform: `scaleX(${0.35 + turnDepth(progress) * 0.65})`,
+    }));
+    const options: KeyframeAnimationOptions = {
+      duration: durationMs,
+      easing: turnEasing,
+      fill: "forwards",
+    };
+    const leafAnimation = leaf.animate(leafFrames, options);
+    const shadowAnimation = castShadow.animate(depthFrames, options);
+    const edgeAnimation = edge.animate(edgeFrames, options);
+    const shadingAnimation = shading.animate(shadingFrames, options);
+    const gutterAnimation = gutterShade.animate(gutterFrames, options);
+    runningAnimations.current = [
+      leafAnimation,
+      shadowAnimation,
+      edgeAnimation,
+      shadingAnimation,
+      gutterAnimation,
+    ];
+    leafAnimation.finished.then(complete).catch(() => undefined);
 
     return () => {
-      leaf.removeEventListener("animationend", complete);
-      leaf.removeEventListener("animationcancel", complete);
+      runningAnimations.current.forEach((animation) => animation.cancel());
+      runningAnimations.current = [];
     };
-  }, [direction, isTurning, onTurnComplete]);
+  }, [applyProgress, mode, onTurnComplete, reducedMotion, turnState]);
+
+  useLayoutEffect(() => {
+    if (turnState.phase === "dragging") {
+      scheduleProgress(visualProgress.current, turnState.turn.direction);
+    }
+  }, [scheduleProgress, turnState]);
 
   const onSurfaceClickCapture: MouseEventHandler<HTMLDivElement> = (event) => {
     if (consumeClickSuppression(event.detail !== 0)) {
@@ -77,7 +329,11 @@ export function PageTurner({
   };
 
   const onSurfaceClick: MouseEventHandler<HTMLDivElement> = (event) => {
-    if (!enabled || isTurning || isInteractiveTarget(event.target)) {
+    if (
+      !enabled ||
+      turnState.phase === "dragging" ||
+      isInteractiveTarget(event.target)
+    ) {
       return;
     }
 
@@ -87,11 +343,10 @@ export function PageTurner({
       return;
     }
 
-    const desktop = window.matchMedia(desktopMediaQuery).matches;
-    const horizontalInset = Math.max(
-      minimumPageEdge,
-      bounds.width * (desktop ? 0.07 : 0.09),
-    );
+    const desktop = mode === "desktop";
+    const horizontalInset = desktop
+      ? Math.max(44, bounds.width * 0.07)
+      : Math.min(64, Math.max(52, bounds.width * 0.11));
     const verticalInset = bounds.height * (desktop ? 0.09 : 0.12);
     const x = event.clientX - bounds.left;
     const y = event.clientY - bounds.top;
@@ -107,50 +362,80 @@ export function PageTurner({
     }
   };
 
+  const activeTurn = turnState.phase === "idle" ? null : turnState.turn;
+  const direction = activeTurn?.direction;
+  const mobileBackward = mode === "mobile" && direction === "backward";
+  const leafFrontContent = mobileBackward
+    ? destinationContent
+    : sourceContent;
+  const leafBackContent =
+    mode === "desktop" ? destinationContent : sourceContent;
+
   return (
     <div
       className="page-turner"
-      data-dragging={isDragging || undefined}
-      data-turn={direction ?? undefined}
+      data-busy={isBusy || undefined}
+      data-mode={mode}
+      data-reduced-motion={reducedMotion || undefined}
+      data-tracking={isTracking || undefined}
+      data-turn={direction}
       onClick={onSurfaceClick}
       onClickCapture={onSurfaceClickCapture}
-      style={style}
+      ref={surfaceRef}
       {...gestureProps}
     >
       <div
-        aria-hidden={isTurning || undefined}
+        aria-hidden={isBusy || undefined}
         className="page-turner__content"
-        inert={isTurning}
+        inert={isBusy}
       >
         {children}
       </div>
-      {isTurning ? (
-        <>
-          {retainStationaryHalf ? (
-            <div
-              aria-hidden="true"
-              className="page-turner__stationary-outgoing"
-              inert
-            >
-              <div className="page-turner__outgoing-composition">
-                {outgoingContent}
+
+      {activeTurn ? (
+        <div aria-hidden="true" className="page-turner__scene" inert>
+          <div className="page-turner__destination" ref={destinationRef}>
+            {destinationContent}
+          </div>
+
+          {mode === "desktop" ? (
+            <div className="page-turner__stationary-source">
+              <div className="page-turner__visual-composition">
+                {sourceContent}
               </div>
             </div>
           ) : null}
-          <div
-            aria-hidden="true"
-            className="page-turner__turning-leaf"
-            inert
-            ref={turningLeaf}
-          >
+
+          <span
+            className="page-turner__cast-shadow"
+            ref={castShadowRef}
+          />
+          <span
+            className="page-turner__gutter-shade"
+            ref={gutterShadeRef}
+          />
+
+          <div className="page-turner__turning-leaf" ref={leafRef}>
             <div className="page-turner__leaf-face page-turner__leaf-face--front">
-              <div className="page-turner__outgoing-composition">
-                {outgoingContent}
+              <div className="page-turner__visual-composition">
+                {leafFrontContent}
               </div>
             </div>
-            <div className="page-turner__leaf-face page-turner__leaf-face--back" />
+            <div
+              className="page-turner__leaf-face page-turner__leaf-face--back"
+              data-paper-back={mode === "mobile" || undefined}
+            >
+              <div className="page-turner__visual-composition">
+                {leafBackContent}
+              </div>
+            </div>
+            <span
+              className="page-turner__leaf-shading"
+              ref={shadingRef}
+            />
+            <span className="page-turner__leaf-edge" ref={edgeRef} />
           </div>
-        </>
+        </div>
       ) : null}
     </div>
   );

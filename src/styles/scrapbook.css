@@ -88,16 +88,11 @@
     transform: translateX(-50%);
   }
 
-  .scrapbook-page-region,
-  .page-turner,
-  .page-turner__content {
-    width: 100%;
-    height: 100%;
-  }
-
   .scrapbook-page-region {
     position: relative;
     z-index: 10;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     border-radius: 0.2rem;
   }
@@ -106,8 +101,17 @@
     pointer-events: none;
   }
 
+  .scrapbook-page-region[aria-busy="true"] {
+    overflow: visible;
+  }
+
   .page-turner {
     position: relative;
+    width: 100%;
+    height: 100%;
+    perspective: 1600px;
+    perspective-origin: 50% 48%;
+    transform-style: preserve-3d;
     touch-action: pan-y pinch-zoom;
     user-select: none;
   }
@@ -120,103 +124,263 @@
   .page-turner__content {
     position: relative;
     z-index: 1;
-    transform: translateX(calc(var(--drag-offset, 0px) * 0.12));
-    transition: transform 180ms ease;
+    width: 100%;
+    height: 100%;
   }
 
-  .page-turner[data-dragging] .page-turner__content {
-    transition: none;
+  .page-turner__scene,
+  .page-turner__destination,
+  .page-turner__turning-leaf,
+  .page-turner__leaf-face,
+  .page-turner__visual-composition {
+    width: 100%;
+    height: 100%;
   }
 
-  .page-turner[data-turn] .page-turner__content {
+  .page-turner__scene,
+  .page-turner__destination,
+  .page-turner__turning-leaf,
+  .page-turner__leaf-face,
+  .page-turner__cast-shadow,
+  .page-turner__gutter-shade {
+    position: absolute;
+  }
+
+  .page-turner__scene,
+  .page-turner__destination,
+  .page-turner__leaf-face {
+    inset: 0;
+  }
+
+  .page-turner__scene {
+    z-index: 20;
     pointer-events: none;
+    transform-style: preserve-3d;
   }
 
-  .page-turner__stationary-outgoing {
+  .page-turner__destination {
+    z-index: 10;
+    overflow: hidden;
+  }
+
+  .page-turner__stationary-source {
     display: none;
   }
 
-  .page-turner__outgoing-composition {
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
   .page-turner__turning-leaf {
-    position: absolute;
-    inset: 0;
     z-index: 40;
-    display: block;
     pointer-events: none;
-    box-shadow: var(--shadow-lifted);
-    transform-origin: left center;
     transform-style: preserve-3d;
-    will-change: transform, opacity;
-    animation: turn-forward var(--page-turn-duration) var(--page-turn-ease)
-      both;
+    will-change: transform;
   }
 
   .page-turner__leaf-face {
-    position: absolute;
-    inset: 0;
     overflow: hidden;
+    background: var(--color-paper);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-  }
-
-  .page-turner__leaf-face--front {
-    background: #dfcba8;
   }
 
   .page-turner__leaf-face--back {
     background:
       linear-gradient(
         90deg,
-        rgb(65 40 24 / 16%),
-        rgb(250 238 214 / 84%) 48%,
-        rgb(66 41 25 / 18%)
+        rgb(65 40 24 / 18%),
+        rgb(250 238 214 / 90%) 45%,
+        rgb(255 250 235 / 32%) 78%,
+        rgb(66 41 25 / 12%)
       ),
-      #e6d4b6;
+      var(--color-paper);
     transform: rotateY(180deg);
   }
 
-  .page-turner[data-turn="backward"] .page-turner__turning-leaf {
+  .page-turner[data-mode="mobile"]
+    .page-turner__leaf-face--back
+    .page-turner__visual-composition {
+    opacity: 0.1;
+    transform: scaleX(-1);
+    mix-blend-mode: multiply;
+  }
+
+  .page-turner__leaf-shading,
+  .page-turner__leaf-edge {
+    position: absolute;
+    inset-block: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .page-turner__leaf-shading {
+    inset-inline: 0;
+    background: linear-gradient(
+      90deg,
+      rgb(50 29 16 / 18%),
+      transparent 16% 72%,
+      rgb(255 248 228 / 18%) 88%,
+      rgb(66 39 22 / 12%)
+    );
+    mix-blend-mode: multiply;
+    opacity: 0.16;
+    transform: translateZ(0.4px) scaleX(0.78);
+    transform-origin: center;
+    will-change: opacity, transform;
+  }
+
+  .page-turner__leaf-edge {
+    right: 0;
+    width: clamp(0.18rem, 0.8cqw, 0.55rem);
+    background: linear-gradient(
+      90deg,
+      rgb(83 54 31 / 26%),
+      rgb(255 248 225 / 82%),
+      rgb(74 45 26 / 18%)
+    );
+    box-shadow: -0.25rem 0 0.45rem rgb(53 31 17 / 18%);
+    opacity: 0;
+    transform: translateZ(0.8px);
+  }
+
+  .page-turner__cast-shadow {
+    top: 1%;
+    bottom: 1%;
+    left: 1%;
+    z-index: 38;
+    width: 48%;
+    background: linear-gradient(
+      90deg,
+      rgb(39 21 12 / 36%),
+      rgb(39 21 12 / 14%) 38%,
+      transparent
+    );
+    filter: blur(0.22rem);
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: left center;
+    will-change: opacity, transform;
+  }
+
+  .page-turner__gutter-shade {
+    top: 1%;
+    bottom: 1%;
+    left: 50%;
+    z-index: 39;
+    width: clamp(0.8rem, 2.2cqw, 1.8rem);
+    background: linear-gradient(
+      90deg,
+      rgb(43 25 14 / 30%),
+      rgb(64 39 22 / 14%) 38%,
+      transparent
+    );
+    filter: blur(0.12rem);
+    opacity: 0;
+    pointer-events: none;
+    transform: scaleX(0.35);
+    transform-origin: left center;
+    will-change: opacity, transform;
+  }
+
+  .page-turner[data-mode="mobile"] .page-turner__gutter-shade {
+    right: auto;
+    left: 0;
+  }
+
+  .page-turner[data-mode="desktop"][data-turn="backward"]
+    .page-turner__gutter-shade {
+    right: 50%;
+    left: auto;
+    background: linear-gradient(
+      270deg,
+      rgb(43 25 14 / 30%),
+      rgb(64 39 22 / 14%) 38%,
+      transparent
+    );
     transform-origin: right center;
-    animation-name: turn-backward;
   }
 
-  @keyframes turn-forward {
-    0% {
-      opacity: 1;
-      transform: perspective(1200px) rotateY(0deg);
-    }
-
-    50% {
-      opacity: 1;
-      transform: perspective(1200px) rotateY(-90deg);
-    }
-
-    100% {
-      opacity: 0.08;
-      transform: perspective(1200px) rotateY(-178deg);
-    }
+  .page-turner[data-mode="mobile"] .page-turner__turning-leaf {
+    inset: 0;
+    transform-origin: left center;
   }
 
-  @keyframes turn-backward {
-    0% {
-      opacity: 1;
-      transform: perspective(1200px) rotateY(0deg);
-    }
+  .page-turner[data-mode="desktop"] .page-turner__turning-leaf,
+  .page-turner[data-mode="desktop"] .page-turner__stationary-source {
+    top: 0;
+    bottom: 0;
+    width: 50%;
+  }
 
-    50% {
-      opacity: 1;
-      transform: perspective(1200px) rotateY(90deg);
-    }
+  .page-turner[data-mode="desktop"] .page-turner__stationary-source {
+    position: absolute;
+    z-index: 35;
+    display: block;
+    overflow: hidden;
+  }
 
-    100% {
-      opacity: 0.08;
-      transform: perspective(1200px) rotateY(178deg);
-    }
+  .page-turner[data-mode="desktop"]
+    .page-turner__stationary-source
+    .page-turner__visual-composition,
+  .page-turner[data-mode="desktop"]
+    .page-turner__turning-leaf
+    .page-turner__visual-composition {
+    width: 200%;
+  }
+
+  .page-turner[data-mode="desktop"][data-turn="forward"]
+    .page-turner__turning-leaf {
+    right: 0;
+    left: 50%;
+    transform-origin: left center;
+  }
+
+  .page-turner[data-mode="desktop"][data-turn="forward"]
+    .page-turner__stationary-source {
+    right: 50%;
+    left: 0;
+  }
+
+  .page-turner[data-mode="desktop"][data-turn="forward"]
+    .page-turner__leaf-face--front
+    .page-turner__visual-composition {
+    transform: translateX(-50%);
+  }
+
+  .page-turner[data-mode="desktop"][data-turn="backward"]
+    .page-turner__turning-leaf {
+    right: 50%;
+    left: 0;
+    transform-origin: right center;
+  }
+
+  .page-turner[data-mode="desktop"][data-turn="backward"]
+    .page-turner__stationary-source {
+    right: 0;
+    left: 50%;
+  }
+
+  .page-turner[data-mode="desktop"][data-turn="backward"]
+    .page-turner__stationary-source
+    .page-turner__visual-composition,
+  .page-turner[data-mode="desktop"][data-turn="backward"]
+    .page-turner__leaf-face--back
+    .page-turner__visual-composition {
+    transform: translateX(-50%);
+  }
+
+  .page-turner[data-mode="desktop"][data-turn="backward"]
+    .page-turner__leaf-edge {
+    right: auto;
+    left: 0;
+    box-shadow: 0.25rem 0 0.45rem rgb(53 31 17 / 18%);
+  }
+
+  .page-turner[data-mode="mobile"][data-turn="backward"]
+    .page-turner__destination {
+    visibility: hidden;
+  }
+
+  .page-turner[data-reduced-motion][data-turn="backward"]
+    .page-turner__destination {
+    visibility: visible;
   }
 
   .desktop-spread {
@@ -851,77 +1015,6 @@
     width: 5rem;
     height: 7rem;
     --rotation: 18deg;
-  }
-
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner[data-turn="forward"]
-    .page-turner__turning-leaf {
-    right: 0;
-    left: 50%;
-  }
-
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner[data-turn="backward"]
-    .page-turner__turning-leaf {
-    right: 50%;
-    left: 0;
-  }
-
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner__stationary-outgoing {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 35;
-    display: block;
-    width: 50%;
-    overflow: hidden;
-    pointer-events: none;
-    animation: release-stationary-page var(--page-turn-duration) linear both;
-  }
-
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner[data-turn="forward"]
-    .page-turner__stationary-outgoing {
-    right: 50%;
-    left: 0;
-  }
-
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner[data-turn="backward"]
-    .page-turner__stationary-outgoing {
-    right: 0;
-    left: 50%;
-  }
-
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner__outgoing-composition {
-    width: 200%;
-  }
-
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner[data-turn="forward"]
-    .page-turner__turning-leaf
-    .page-turner__outgoing-composition,
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner[data-turn="backward"]
-    .page-turner__stationary-outgoing
-    .page-turner__outgoing-composition {
-    transform: translateX(-50%);
-  }
-
-  @keyframes release-stationary-page {
-    0%,
-    49.99% {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    50%,
-    100% {
-      visibility: hidden;
-      opacity: 0;
-    }
   }
 
   /* Book-relative type keeps every collage legible when a short viewport makes
