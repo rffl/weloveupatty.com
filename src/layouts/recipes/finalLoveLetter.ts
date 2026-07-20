@@ -43,7 +43,7 @@ export const finalLoveLetter = {
     },
     {
       kind: "stamp",
-      label: "OPEN WHEN\nYOU MISS US",
+      labelKey: "finalLoveLetterStamp",
       placement: {
         desktop: { top: "6%", right: "6%", width: "23%", height: "15%", rotate: 8, z: 9 },
         mobile: { top: "9%", right: "3%", width: "27%", height: "12%", rotate: 8, z: 9 },

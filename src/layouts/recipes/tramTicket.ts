@@ -78,7 +78,7 @@ export const tramTicket = {
   decorations: [
     {
       kind: "ticket",
-      label: "86 · MELBOURNE\nVALID FOREVER",
+      labelKey: "tramTicketPass",
       placement: {
         desktop: {
           top: "8%",
@@ -100,7 +100,7 @@ export const tramTicket = {
     },
     {
       kind: "doodle",
-      label: "ding ding ↗",
+      labelKey: "tramTicketDoodle",
       placement: {
         desktop: {
           bottom: "4%",

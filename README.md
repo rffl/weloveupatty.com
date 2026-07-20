@@ -14,13 +14,22 @@ Use Node 22.12.0 (recorded in `.nvmrc`) and npm 10.9.0. There is no backend, rou
 
 ## Replace the placeholders
 
-All scrapbook copy, contribution order, layout choices, photo metadata, and photo paths have one source of truth:
+All replaceable scrapbook copy, contribution order, layout choices, photo metadata, and photo paths have one source of truth:
 
 `src/content/scrapbook.ts`
 
 Binary image files live separately in `public/photos/`. Do not import them into the content file.
 
-The top-level content includes `title`, `subtitle`, the opening-page `eyebrow`, `title`, and `message`, and the closing-page `title`, `message`, and `signature`. Each contribution includes:
+The top-level content includes:
+
+- `title`, `subtitle`, and `metadata.description` for the cover and document metadata
+- `cover` copy for its label, stamp, and inside-pocket dedication
+- `opening` copy for its dedication, stamp, doodle, and three-part route
+- `closing` copy for its farewell letter and postscript
+- `tableScatter` copy for the loose ticket and pencil note around the book
+- `recipeDecorationLabels`, a typed map containing every replaceable stamp, ticket, receipt, and doodle phrase used by the 15 page recipes
+
+The Vite build injects `title` and `metadata.description` into `index.html`, so they should be changed in the content object rather than edited in the HTML shell. Each contribution includes:
 
 - `id`: a stable, unique page identifier
 - `friendName`: the friend's displayed name

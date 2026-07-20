@@ -13,15 +13,13 @@ export function ClosingPage({ content }: ClosingPageProps) {
       <Decoration kind="heart" className="closing-page__heart" />
 
       <div className="closing-page__letter">
-        <p className="closing-page__eyebrow">Patty, one last thing…</p>
+        <p className="closing-page__eyebrow">{content.eyebrow}</p>
         <h2>{content.title}</h2>
         <p>{content.message}</p>
         <strong>{content.signature}</strong>
       </div>
 
-      <p className="closing-page__postscript">
-        P.S. Melbourne is still yours whenever you come home.
-      </p>
+      <p className="closing-page__postscript">{content.postscript}</p>
     </section>
   );
 }

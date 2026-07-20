@@ -11,13 +11,13 @@ export function OpeningPage({ content }: OpeningPageProps) {
       <Decoration kind="tape" className="opening-page__tape" />
       <Decoration
         kind="stamp"
-        label={"MELBOURNE\nWITH LOVE"}
+        label={content.stamp}
         className="opening-page__stamp"
       />
       <Decoration kind="map" className="opening-page__map" />
       <Decoration
         kind="doodle"
-        label="turn slowly →"
+        label={content.doodle}
         className="opening-page__doodle"
       />
 
@@ -29,11 +29,11 @@ export function OpeningPage({ content }: OpeningPageProps) {
       </div>
 
       <div className="opening-page__route" aria-hidden="true">
-        <span>the first hello</span>
+        <span>{content.route[0]}</span>
         <i />
-        <span>four years of us</span>
+        <span>{content.route[1]}</span>
         <i />
-        <span>never really goodbye</span>
+        <span>{content.route[2]}</span>
       </div>
     </section>
   );

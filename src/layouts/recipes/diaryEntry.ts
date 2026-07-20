@@ -43,7 +43,7 @@ export const diaryEntry = {
     },
     {
       kind: "doodle",
-      label: "Dear diary…",
+      labelKey: "diaryEntryDoodle",
       treatment: "diary-heading",
       placement: {
         desktop: { top: "2%", right: "1%", width: "27%", rotate: -5, z: 8 },

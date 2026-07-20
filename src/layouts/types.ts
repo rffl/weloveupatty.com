@@ -1,7 +1,10 @@
 import type { DecorationKind } from "../components/Decoration";
 import type { NoteVariant } from "../components/OpenableNote";
 import type { PhotoFrameVariant } from "../components/PhotoFrame";
-import type { ContributionLayout } from "../content/types";
+import type {
+  ContributionLayout,
+  RecipeDecorationLabelKey,
+} from "../content/types";
 
 export type ResponsiveMode = "desktop" | "mobile";
 export type PageSurface = "paper" | "light" | "graph" | "kraft" | "black";
@@ -54,7 +57,7 @@ export type MessagePiece = Readonly<{
 
 export type DecorationPiece = Readonly<{
   kind: DecorationKind;
-  label?: string;
+  labelKey?: RecipeDecorationLabelKey;
   treatment?: DecorationTreatment;
   placement: ResponsivePlacement;
 }>;

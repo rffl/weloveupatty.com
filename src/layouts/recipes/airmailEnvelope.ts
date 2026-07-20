@@ -77,7 +77,7 @@ export const airmailEnvelope = {
   decorations: [
     {
       kind: "stamp",
-      label: "MELBOURNE\nVIC",
+      labelKey: "airmailEnvelopeStamp",
       placement: {
         desktop: {
           top: "9%",
@@ -99,7 +99,7 @@ export const airmailEnvelope = {
     },
     {
       kind: "doodle",
-      label: "MEL → YOU",
+      labelKey: "airmailEnvelopeRoute",
       placement: {
         desktop: {
           right: "4%",

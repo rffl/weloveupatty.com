@@ -4,7 +4,10 @@ import type { CSSProperties } from "react";
 import { Decoration } from "../components/Decoration";
 import { OpenableNote } from "../components/OpenableNote";
 import { PhotoFrame } from "../components/PhotoFrame";
-import type { Contribution } from "../content/types";
+import type {
+  Contribution,
+  RecipeDecorationLabels,
+} from "../content/types";
 import type {
   LayoutRecipe,
   PiecePlacement,
@@ -13,6 +16,7 @@ import type {
 
 type ContributionLayoutProps = {
   readonly contribution: Contribution;
+  readonly decorationLabels: RecipeDecorationLabels;
   readonly recipe: LayoutRecipe;
   readonly mode: ResponsiveMode;
   readonly eagerPhotos?: boolean;
@@ -53,6 +57,7 @@ const surfaceClasses = {
 
 export function ContributionLayout({
   contribution,
+  decorationLabels,
   recipe,
   mode,
   eagerPhotos = false,
@@ -142,7 +147,7 @@ export function ContributionLayout({
           }`}
           key={`${contribution.id}-decoration-${index}`}
           kind={piece.kind}
-          label={piece.label}
+          label={piece.labelKey ? decorationLabels[piece.labelKey] : undefined}
           style={pieceStyle(piece.placement[mode])}
         />
       ))}

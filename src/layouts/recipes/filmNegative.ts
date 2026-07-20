@@ -51,7 +51,7 @@ export const filmNegative = {
     },
     {
       kind: "doodle",
-      label: "keep the outtakes",
+      labelKey: "filmNegativeDoodle",
       treatment: "dark-label",
       placement: {
         desktop: { top: "64%", right: "4%", width: "32%", rotate: -7, z: 9 },

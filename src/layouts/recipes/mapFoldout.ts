@@ -139,7 +139,7 @@ export const mapFoldout = {
     },
     {
       kind: "doodle",
-      label: "we were here ↗",
+      labelKey: "mapFoldoutDoodle",
       placement: {
         desktop: {
           top: "59%",

@@ -223,14 +223,18 @@ export function Scrapbook({ content }: ScrapbookProps) {
       </a>
 
       <div className="table-scatter" aria-hidden="true">
-        <span className="table-scatter__tram-ticket">METCARD · 86</span>
+        <span className="table-scatter__tram-ticket">
+          {content.tableScatter.tramTicket}
+        </span>
         <span className="table-scatter__coffee-ring" />
-        <span className="table-scatter__pencil">Patty was here ♥</span>
+        <span className="table-scatter__pencil">
+          {content.tableScatter.pencil}
+        </span>
       </div>
 
       <div className="scrapbook-stage">
         <div
-          aria-label="Patty's Melbourne memory book"
+          aria-label={content.title}
           className="scrapbook-book"
           data-cover-phase={coverPhase}
           role="group"
@@ -238,7 +242,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
           <div
             aria-busy={turner.isTurning || undefined}
             aria-hidden={!contentOpen}
-            aria-label="Patty's Melbourne scrapbook pages"
+            aria-label="Scrapbook pages"
             className="scrapbook-page-region"
             id="scrapbook-content"
             inert={!contentOpen}
@@ -259,6 +263,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
                 turner.outgoingPageIndex === null ? null : (
                   <SpreadRenderer
                     activePageIndex={turner.outgoingPageIndex}
+                    decorationLabels={content.recipeDecorationLabels}
                     desktopSpreads={desktopSpreads}
                     engagementEnabled={false}
                     mode={mode}
@@ -271,6 +276,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
             >
               <SpreadRenderer
                 activePageIndex={turner.activePageIndex}
+                decorationLabels={content.recipeDecorationLabels}
                 desktopSpreads={desktopSpreads}
                 engagementEnabled={contentOpen && !turner.isTurning}
                 mode={mode}
@@ -285,6 +291,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
           ) : null}
 
           <Cover
+            content={content.cover}
             onOpen={beginOpening}
             onTransitionSettled={settleCoverTransition}
             phase={coverPhase}

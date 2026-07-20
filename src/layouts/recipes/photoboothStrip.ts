@@ -120,7 +120,7 @@ export const photoboothStrip = {
     },
     {
       kind: "doodle",
-      label: "again! again!",
+      labelKey: "photoboothDoodle",
       placement: {
         desktop: {
           top: "12%",

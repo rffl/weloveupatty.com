@@ -61,7 +61,6 @@ export function ReadingView({
       ref={dialogRef}
     >
       <article
-        aria-labelledby={titleId}
         className="reading-view__paper paper-surface paper-surface--light"
       >
         <button
@@ -74,7 +73,12 @@ export function ReadingView({
           Close ×
         </button>
 
-        <div className="reading-view__content">
+        <div
+          aria-label={`Full message from ${title}`}
+          className="reading-view__content"
+          role="region"
+          tabIndex={0}
+        >
           {detail ? <p className="reading-view__detail">{detail}</p> : null}
           <h2 id={titleId}>{title}</h2>
           <p className="reading-view__message">{message}</p>

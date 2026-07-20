@@ -117,7 +117,13 @@ export function PageTurner({
       style={style}
       {...gestureProps}
     >
-      <div className="page-turner__content">{children}</div>
+      <div
+        aria-hidden={isTurning || undefined}
+        className="page-turner__content"
+        inert={isTurning}
+      >
+        {children}
+      </div>
       {isTurning ? (
         <>
           {retainStationaryHalf ? (

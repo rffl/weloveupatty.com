@@ -36,7 +36,7 @@ export const eventTicket = {
   decorations: [
     {
       kind: "ticket",
-      label: "ADMIT TWO\nONE PERFECT NIGHT",
+      labelKey: "eventTicketAdmission",
       treatment: "compact-ticket",
       placement: {
         desktop: { top: "3%", left: "3%", width: "30%", height: "10%", rotate: -4, z: 8 },
@@ -45,7 +45,7 @@ export const eventTicket = {
     },
     {
       kind: "stamp",
-      label: "USED\nWITH LOVE",
+      labelKey: "eventTicketStamp",
       placement: {
         desktop: { bottom: "4%", right: "4%", width: "19%", height: "13%", rotate: 8, z: 9 },
         mobile: { bottom: "3%", right: "3%", width: "23%", height: "11%", rotate: 8, z: 9 },

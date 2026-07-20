@@ -25,10 +25,10 @@ type DecorationProps = {
 
 const defaultLabels: Record<DecorationKind, string> = {
   tape: "",
-  stamp: "Melbourne\nVIC",
-  ticket: "Tram ticket",
-  receipt: "Melbourne memory",
-  doodle: "always us ↗",
+  stamp: "",
+  ticket: "",
+  receipt: "",
+  doodle: "",
   flower: "",
   film: "",
   map: "",

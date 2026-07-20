@@ -56,7 +56,7 @@ export const postcard = {
   decorations: [
     {
       kind: "stamp",
-      label: "MELBOURNE\n2026",
+      labelKey: "postcardStamp",
       placement: {
         desktop: {
           top: "12%",
@@ -78,7 +78,7 @@ export const postcard = {
     },
     {
       kind: "doodle",
-      label: "wish you could stay",
+      labelKey: "postcardDoodle",
       placement: {
         desktop: {
           bottom: "4%",

@@ -74,7 +74,7 @@ export const foldedLetter = {
     },
     {
       kind: "stamp",
-      label: "KEEP\nFOREVER",
+      labelKey: "foldedLetterStamp",
       placement: {
         desktop: {
           right: "4%",

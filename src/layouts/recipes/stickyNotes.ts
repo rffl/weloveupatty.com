@@ -50,7 +50,7 @@ export const stickyNotes = {
     },
     {
       kind: "doodle",
-      label: "remember this bit! ↗",
+      labelKey: "stickyNotesDoodle",
       treatment: "memory-callout",
       placement: {
         desktop: { top: "43%", left: "5%", width: "31%", rotate: -8, z: 8 },

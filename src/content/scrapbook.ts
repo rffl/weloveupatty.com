@@ -20,17 +20,61 @@ function photo(
 export const scrapbook = {
   title: "We Love You, Patty",
   subtitle: "Four years in Melbourne, and a lifetime of people who love you.",
+  metadata: {
+    description:
+      "A handmade digital scrapbook celebrating Patty's four years in Melbourne.",
+  },
+  cover: {
+    eyebrow: "Melbourne · 4 years",
+    stamp: "PATTY\nMELBOURNE",
+    insideMaker: "made by many hands",
+    insideDedication: "for Patty, with love",
+    insideFooter: "Melbourne · forever",
+  },
   opening: {
     eyebrow: "Melbourne · four unforgettable years",
     title: "This city was better with you in it.",
     message:
       "Fifteen friends left you photographs, memories, wishes, and little pieces of Melbourne. Turn the pages slowly — this was made with all our love.",
+    stamp: "MELBOURNE\nWITH LOVE",
+    doodle: "turn slowly →",
+    route: [
+      "the first hello",
+      "four years of us",
+      "never really goodbye",
+    ],
   },
   closing: {
+    eyebrow: "Patty, one last thing…",
     title: "Never really goodbye.",
     message:
       "Melbourne will always carry traces of you, and every one of us carries a piece of the life we shared here. Wherever you go next, you take our love with you.",
     signature: "All of us, always",
+    postscript: "P.S. Melbourne is still yours whenever you come home.",
+  },
+  tableScatter: {
+    tramTicket: "METCARD · 86",
+    pencil: "Patty was here ♥",
+  },
+  recipeDecorationLabels: {
+    mapFoldoutDoodle: "we were here ↗",
+    foldedLetterStamp: "KEEP\nFOREVER",
+    finalLoveLetterStamp: "OPEN WHEN\nYOU MISS US",
+    tramTicketPass: "86 · MELBOURNE\nVALID FOREVER",
+    tramTicketDoodle: "ding ding ↗",
+    stickyNotesDoodle: "remember this bit! ↗",
+    coffeeReceiptOrder: "2 × FLAT WHITE\n1 × VERY LONG CHAT",
+    coffeeReceiptDoodle: "same table next time?",
+    airmailEnvelopeStamp: "MELBOURNE\nVIC",
+    airmailEnvelopeRoute: "MEL → YOU",
+    filmNegativeDoodle: "keep the outtakes",
+    diaryEntryDoodle: "Dear diary…",
+    postcardStamp: "MELBOURNE\n2026",
+    postcardDoodle: "wish you could stay",
+    tornNotebookDoodle: "do not forget this",
+    eventTicketAdmission: "ADMIT TWO\nONE PERFECT NIGHT",
+    eventTicketStamp: "USED\nWITH LOVE",
+    photoboothDoodle: "again! again!",
   },
   contributions: [
     {

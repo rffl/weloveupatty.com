@@ -1,5 +1,6 @@
 import { ClosingPage } from "../components/ClosingPage";
 import { OpeningPage } from "../components/OpeningPage";
+import type { RecipeDecorationLabels } from "../content/types";
 import { ContributionLayout } from "../layouts/ContributionLayout";
 import { getLayoutRecipe } from "../layouts";
 import type { ResponsiveMode } from "../layouts/types";
@@ -12,6 +13,7 @@ type SpreadRendererProps = {
   activePageIndex: number;
   mode: ResponsiveMode;
   engagementEnabled: boolean;
+  decorationLabels: RecipeDecorationLabels;
   onRememberPage: (pageIndex: number) => void;
 };
 
@@ -21,6 +23,7 @@ type PageViewProps = {
   mode: ResponsiveMode;
   side: "left" | "right" | "single";
   engagementEnabled: boolean;
+  decorationLabels: RecipeDecorationLabels;
   onRememberPage: (pageIndex: number) => void;
 };
 
@@ -42,6 +45,7 @@ function PageView({
   mode,
   side,
   engagementEnabled,
+  decorationLabels,
   onRememberPage,
 }: PageViewProps) {
   const rememberThisPage = () => {
@@ -65,6 +69,7 @@ function PageView({
       {page.kind === "contribution" ? (
         <ContributionLayout
           contribution={page.contribution}
+          decorationLabels={decorationLabels}
           eagerPhotos
           mode={mode}
           recipe={getLayoutRecipe(page.contribution.layout)}
@@ -81,6 +86,7 @@ export function SpreadRenderer({
   activePageIndex,
   mode,
   engagementEnabled,
+  decorationLabels,
   onRememberPage,
 }: SpreadRendererProps) {
   let visiblePages: readonly {
@@ -122,6 +128,7 @@ export function SpreadRenderer({
     >
       {visiblePages.map(({ page, pageIndex, side }) => (
         <PageView
+          decorationLabels={decorationLabels}
           engagementEnabled={engagementEnabled}
           key={page.id}
           mode={mode}

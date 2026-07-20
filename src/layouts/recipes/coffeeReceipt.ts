@@ -79,7 +79,7 @@ export const coffeeReceipt = {
   decorations: [
     {
       kind: "receipt",
-      label: "2 × FLAT WHITE\n1 × VERY LONG CHAT",
+      labelKey: "coffeeReceiptOrder",
       placement: {
         desktop: {
           bottom: "11%",
@@ -120,7 +120,7 @@ export const coffeeReceipt = {
     },
     {
       kind: "doodle",
-      label: "same table next time?",
+      labelKey: "coffeeReceiptDoodle",
       placement: {
         desktop: {
           bottom: "4%",
