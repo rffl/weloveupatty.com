@@ -170,7 +170,7 @@ export function useSwipeGesture({
     const vertical = event.clientY - startY.current;
     rememberSample(event.clientX, event.timeStamp);
 
-    if (Math.hypot(horizontal, vertical) > clickSuppressionDistance) {
+    if (Math.hypot(horizontal, vertical) >= clickSuppressionDistance) {
       didDrag.current = true;
     }
 
@@ -248,7 +248,7 @@ export function useSwipeGesture({
       surfaceWidth.current,
     );
 
-    if (Math.hypot(horizontal, vertical) > clickSuppressionDistance) {
+    if (Math.hypot(horizontal, vertical) >= clickSuppressionDistance) {
       didDrag.current = true;
     }
     preserveClickSuppression();
