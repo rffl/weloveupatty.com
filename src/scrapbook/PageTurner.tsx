@@ -7,6 +7,8 @@ import { isInteractiveTarget, useSwipeGesture } from "./useSwipeGesture";
 
 type PageTurnerProps = {
   children: ReactNode;
+  outgoingContent: ReactNode | null;
+  retainStationaryHalf: boolean;
   enabled: boolean;
   isTurning: boolean;
   direction: TurnDirection | null;
@@ -23,6 +25,8 @@ const minimumPageEdge = 36;
 
 export function PageTurner({
   children,
+  outgoingContent,
+  retainStationaryHalf,
   enabled,
   isTurning,
   direction,
@@ -32,7 +36,7 @@ export function PageTurner({
   onNext,
   onTurnComplete,
 }: PageTurnerProps) {
-  const turningLeaf = useRef<HTMLSpanElement>(null);
+  const turningLeaf = useRef<HTMLDivElement>(null);
   const { dragOffset, isDragging, consumeClickSuppression, gestureProps } =
     useSwipeGesture({
       enabled: enabled && !isTurning,
@@ -115,11 +119,32 @@ export function PageTurner({
     >
       <div className="page-turner__content">{children}</div>
       {isTurning ? (
-        <span
-          className="page-turner__turning-leaf"
-          aria-hidden="true"
-          ref={turningLeaf}
-        />
+        <>
+          {retainStationaryHalf ? (
+            <div
+              aria-hidden="true"
+              className="page-turner__stationary-outgoing"
+              inert
+            >
+              <div className="page-turner__outgoing-composition">
+                {outgoingContent}
+              </div>
+            </div>
+          ) : null}
+          <div
+            aria-hidden="true"
+            className="page-turner__turning-leaf"
+            inert
+            ref={turningLeaf}
+          >
+            <div className="page-turner__leaf-face page-turner__leaf-face--front">
+              <div className="page-turner__outgoing-composition">
+                {outgoingContent}
+              </div>
+            </div>
+            <div className="page-turner__leaf-face page-turner__leaf-face--back" />
+          </div>
+        </>
       ) : null}
     </div>
   );

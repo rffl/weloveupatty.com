@@ -247,6 +247,19 @@ export function Scrapbook({ content }: ScrapbookProps) {
               onNext={requestNext}
               onPrevious={requestPrevious}
               onTurnComplete={turner.completeTurn}
+              outgoingContent={
+                turner.outgoingPageIndex === null ? null : (
+                  <SpreadRenderer
+                    activePageIndex={turner.outgoingPageIndex}
+                    desktopSpreads={desktopSpreads}
+                    engagementEnabled={false}
+                    mode={mode}
+                    onRememberPage={turner.rememberPage}
+                    pages={pages}
+                  />
+                )
+              }
+              retainStationaryHalf={mode === "desktop"}
             >
               <SpreadRenderer
                 activePageIndex={turner.activePageIndex}

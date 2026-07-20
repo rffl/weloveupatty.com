@@ -33,6 +33,9 @@ const turnFallbackDelay = 800;
 export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
   const [coverOpen, setCoverOpen] = useState(false);
   const [activePageIndex, setActivePageIndex] = useState(0);
+  const [outgoingPageIndex, setOutgoingPageIndex] = useState<number | null>(
+    null,
+  );
   const [activeTurn, setActiveTurn] = useState<ActiveTurn | null>(null);
   const coverOpenRef = useRef(false);
   const activePageIndexRef = useRef(0);
@@ -56,6 +59,7 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
     }
 
     setActiveTurn((current) => (current?.id === turnId ? null : current));
+    setOutgoingPageIndex(null);
   }, []);
 
   const completeTurn = useCallback(() => {
@@ -114,6 +118,7 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
       const turnId = nextTurnId.current + 1;
       nextTurnId.current = turnId;
       activeTurnId.current = turnId;
+      setOutgoingPageIndex(activePageIndexRef.current);
       activePageIndexRef.current = nextIndex;
       setActiveTurn({ id: turnId, direction });
       setActivePageIndex(nextIndex);
@@ -221,6 +226,7 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
     coverOpen,
     openCover,
     activePageIndex,
+    outgoingPageIndex,
     activeStep,
     totalSteps,
     turnDirection: activeTurn?.direction ?? null,

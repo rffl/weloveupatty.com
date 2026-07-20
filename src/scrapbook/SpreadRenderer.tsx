@@ -83,61 +83,54 @@ export function SpreadRenderer({
   engagementEnabled,
   onRememberPage,
 }: SpreadRendererProps) {
+  let visiblePages: readonly {
+    page: ScrapbookPage;
+    pageIndex: number;
+    side: "left" | "right" | "single";
+  }[] = [];
+  let isSingle = false;
+
   if (mode === "mobile") {
     const page = pages[activePageIndex];
 
-    if (!page) {
-      return null;
+    if (page) {
+      visiblePages = [{ page, pageIndex: activePageIndex, side: "single" }];
+      isSingle = true;
     }
+  } else {
+    const spread = desktopSpreads[desktopSpreadForPageIndex(activePageIndex)];
 
-    return (
-      <div className="mobile-page" key={page.id}>
-        <PageView
-          engagementEnabled={engagementEnabled}
-          mode={mode}
-          onRememberPage={onRememberPage}
-          page={page}
-          pageIndex={activePageIndex}
-          side="single"
-        />
-      </div>
-    );
+    if (spread) {
+      const [left, right] = spread.pages;
+      const leftIndex = spread.index === 0 ? 0 : spread.index * 2 - 1;
+      isSingle = !right;
+      visiblePages = right
+        ? [
+            { page: left, pageIndex: leftIndex, side: "left" },
+            { page: right, pageIndex: leftIndex + 1, side: "right" },
+          ]
+        : [{ page: left, pageIndex: leftIndex, side: "single" }];
+    }
   }
-
-  const spread = desktopSpreads[desktopSpreadForPageIndex(activePageIndex)];
-
-  if (!spread) {
-    return null;
-  }
-
-  const [left, right] = spread.pages;
-  const leftIndex = spread.index === 0 ? 0 : spread.index * 2 - 1;
-  const isSingle = !right;
 
   return (
     <div
-      className="desktop-spread"
+      className={`scrapbook-pages ${
+        mode === "mobile" ? "mobile-page" : "desktop-spread"
+      }`}
       data-single={isSingle || undefined}
-      key={`spread-${spread.index}`}
     >
-      <PageView
-        engagementEnabled={engagementEnabled}
-        mode={mode}
-        onRememberPage={onRememberPage}
-        page={left}
-        pageIndex={leftIndex}
-        side={isSingle ? "single" : "left"}
-      />
-      {right ? (
+      {visiblePages.map(({ page, pageIndex, side }) => (
         <PageView
           engagementEnabled={engagementEnabled}
+          key={page.id}
           mode={mode}
           onRememberPage={onRememberPage}
-          page={right}
-          pageIndex={leftIndex + 1}
-          side="right"
+          page={page}
+          pageIndex={pageIndex}
+          side={side}
         />
-      ) : null}
+      ))}
     </div>
   );
 }

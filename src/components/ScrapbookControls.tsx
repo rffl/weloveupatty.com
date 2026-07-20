@@ -28,15 +28,16 @@ export function ScrapbookControls({
       data-turning={isTurning || undefined}
     >
       <button
-        type="button"
-        className="scrapbook-control scrapbook-control--previous"
         aria-disabled={previousUnavailable}
-        disabled={!canPrevious}
+        className="scrapbook-control scrapbook-control--previous"
+        data-boundary={!canPrevious || undefined}
+        data-turning={isTurning || undefined}
         onClick={() => {
           if (!previousUnavailable) {
             onPrevious();
           }
         }}
+        type="button"
       >
         <span aria-hidden="true">←</span> Back
       </button>
@@ -47,15 +48,16 @@ export function ScrapbookControls({
         </strong>
       </p>
       <button
-        type="button"
-        className="scrapbook-control scrapbook-control--next"
         aria-disabled={nextUnavailable}
-        disabled={!canNext}
+        className="scrapbook-control scrapbook-control--next"
+        data-boundary={!canNext || undefined}
+        data-turning={isTurning || undefined}
         onClick={() => {
           if (!nextUnavailable) {
             onNext();
           }
         }}
+        type="button"
       >
         Next <span aria-hidden="true">→</span>
       </button>
