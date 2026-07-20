@@ -1,2 +1,179 @@
 @layer components {
+  .page-turner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .page-turner__content {
+    width: 100%;
+    height: 100%;
+    transform: translateX(calc(var(--drag-offset, 0px) * 0.12));
+    transition: transform 180ms ease;
+  }
+
+  .page-turner[data-dragging] .page-turner__content {
+    transition: none;
+  }
+
+  .page-turner__turning-leaf {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: block;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        rgb(73 45 27 / 20%) 47%,
+        rgb(247 233 207 / 88%) 50%,
+        transparent 54%
+      ),
+      #dfcba8;
+    box-shadow: var(--shadow-lifted);
+    transform-origin: left center;
+    animation: turn-forward var(--page-turn-duration) var(--page-turn-ease) both;
+  }
+
+  .page-turner[data-turn="backward"] .page-turner__turning-leaf {
+    transform-origin: right center;
+    animation-name: turn-backward;
+  }
+
+  @keyframes turn-forward {
+    0% {
+      transform: perspective(1200px) rotateY(92deg);
+      opacity: 0;
+    }
+
+    15% {
+      opacity: 1;
+    }
+
+    100% {
+      transform: perspective(1200px) rotateY(-92deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes turn-backward {
+    0% {
+      transform: perspective(1200px) rotateY(-92deg);
+      opacity: 0;
+    }
+
+    15% {
+      opacity: 1;
+    }
+
+    100% {
+      transform: perspective(1200px) rotateY(92deg);
+      opacity: 0;
+    }
+  }
+
+  .page-turner__edge {
+    position: absolute;
+    top: 9%;
+    bottom: 9%;
+    z-index: 30;
+    width: 7%;
+    min-width: 2.25rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .page-turner__edge:disabled {
+    cursor: default;
+  }
+
+  .page-turner__edge--previous {
+    left: 0;
+  }
+
+  .page-turner__edge--next {
+    right: 0;
+  }
+
+  .scrapbook-controls {
+    position: absolute;
+    right: 50%;
+    bottom: clamp(0.35rem, 1.6vh, 1rem);
+    z-index: 80;
+    display: flex;
+    align-items: end;
+    gap: clamp(0.4rem, 2vw, 1rem);
+    transform: translateX(50%);
+  }
+
+  .scrapbook-control {
+    min-width: 5.1rem;
+    padding: 0.58rem 0.75rem;
+    font-family: var(--font-typewriter);
+    font-size: clamp(0.64rem, 1.2vw, 0.78rem);
+    border: 0;
+    background: #e9d8b9;
+    box-shadow: var(--shadow-contact);
+    cursor: pointer;
+  }
+
+  .scrapbook-control--previous {
+    transform: rotate(-2deg);
+  }
+
+  .scrapbook-control--next {
+    transform: rotate(2deg);
+  }
+
+  .scrapbook-control:disabled {
+    cursor: default;
+    opacity: 0.38;
+  }
+
+  .scrapbook-progress {
+    display: grid;
+    min-width: 4.2rem;
+    margin: 0;
+    padding: 0.42rem 0.55rem 1rem;
+    color: var(--color-paper-light);
+    text-align: center;
+    background: var(--color-postmark-red);
+    box-shadow: var(--shadow-contact);
+    transform: rotate(-1deg);
+  }
+
+  .scrapbook-progress span {
+    font-family: var(--font-hand);
+    font-size: 0.85rem;
+  }
+
+  .scrapbook-progress strong {
+    font-family: var(--font-typewriter);
+    font-size: 0.68rem;
+  }
+
+  @media (max-width: 899px) {
+    .page-turner__edge {
+      top: 12%;
+      bottom: 12%;
+      width: 9%;
+    }
+
+    .scrapbook-controls {
+      width: calc(100% - 1rem);
+      justify-content: space-between;
+    }
+
+    .scrapbook-progress {
+      position: absolute;
+      right: 50%;
+      bottom: 0;
+      transform: translateX(50%) rotate(-1deg);
+    }
+  }
 }
