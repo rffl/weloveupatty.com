@@ -75,31 +75,6 @@
     }
   }
 
-  .page-turner__edge {
-    position: absolute;
-    top: 9%;
-    bottom: 9%;
-    z-index: 30;
-    width: 7%;
-    min-width: 2.25rem;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .page-turner__edge:disabled {
-    cursor: default;
-  }
-
-  .page-turner__edge--previous {
-    left: 0;
-  }
-
-  .page-turner__edge--next {
-    right: 0;
-  }
-
   .scrapbook-controls {
     position: absolute;
     right: 50%;
@@ -157,13 +132,7 @@
     font-size: 0.68rem;
   }
 
-  @media (max-width: 899px) {
-    .page-turner__edge {
-      top: 12%;
-      bottom: 12%;
-      width: 9%;
-    }
-
+  @media (width < 900px) {
     .scrapbook-controls {
       width: calc(100% - 1rem);
       justify-content: space-between;

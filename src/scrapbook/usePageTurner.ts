@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ResponsiveMode } from "../layouts/types";
 import {
@@ -8,40 +8,79 @@ import {
 
 export type TurnDirection = "forward" | "backward";
 
+type ActiveTurn = {
+  id: number;
+  direction: TurnDirection;
+};
+
 type PageTurnerOptions = {
   pageCount: number;
   mode: ResponsiveMode;
 };
 
+const turnFallbackDelay = 800;
+
 export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
   const [coverOpen, setCoverOpen] = useState(false);
   const [activePageIndex, setActivePageIndex] = useState(0);
-  const [turnDirection, setTurnDirection] = useState<TurnDirection | null>(null);
+  const [activeTurn, setActiveTurn] = useState<ActiveTurn | null>(null);
+  const activeTurnId = useRef<number | null>(null);
+  const nextTurnId = useRef(0);
   const transitionTimer = useRef<number | null>(null);
   const lastPageIndex = Math.max(0, pageCount - 1);
   const desktopSpreadCount = 1 + Math.ceil(Math.max(0, pageCount - 1) / 2);
+
+  const finishTurn = useCallback((turnId: number) => {
+    if (activeTurnId.current !== turnId) {
+      return;
+    }
+
+    activeTurnId.current = null;
+
+    if (transitionTimer.current !== null) {
+      window.clearTimeout(transitionTimer.current);
+      transitionTimer.current = null;
+    }
+
+    setActiveTurn((current) => (current?.id === turnId ? null : current));
+  }, []);
+
+  const completeTurn = useCallback(() => {
+    if (activeTurn !== null) {
+      finishTurn(activeTurn.id);
+    }
+  }, [activeTurn, finishTurn]);
 
   useEffect(() => {
     return () => {
       if (transitionTimer.current !== null) {
         window.clearTimeout(transitionTimer.current);
+        transitionTimer.current = null;
       }
+
+      activeTurnId.current = null;
     };
   }, []);
 
   function navigateToPage(target: number, direction: TurnDirection) {
     const nextIndex = Math.max(0, Math.min(lastPageIndex, target));
 
-    if (transitionTimer.current !== null || nextIndex === activePageIndex) {
+    if (
+      activeTurn !== null ||
+      activeTurnId.current !== null ||
+      nextIndex === activePageIndex
+    ) {
       return;
     }
 
-    setTurnDirection(direction);
+    const turnId = nextTurnId.current + 1;
+    nextTurnId.current = turnId;
+    activeTurnId.current = turnId;
+    setActiveTurn({ id: turnId, direction });
     setActivePageIndex(nextIndex);
     transitionTimer.current = window.setTimeout(() => {
-      setTurnDirection(null);
-      transitionTimer.current = null;
-    }, 520);
+      finishTurn(turnId);
+    }, turnFallbackDelay);
   }
 
   function next() {
@@ -65,7 +104,7 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
   }
 
   function previous() {
-    if (!coverOpen || turnDirection) {
+    if (!coverOpen || activeTurn !== null || activeTurnId.current !== null) {
       return;
     }
 
@@ -107,10 +146,11 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
     activePageIndex,
     activeStep,
     totalSteps,
-    turnDirection,
-    isTurning: turnDirection !== null,
+    turnDirection: activeTurn?.direction ?? null,
+    isTurning: activeTurn !== null,
     canPrevious: coverOpen,
     canNext,
+    completeTurn,
     next,
     previous,
     goToPage,

@@ -9,6 +9,17 @@ type SwipeGestureOptions = {
 
 const swipeThreshold = 56;
 const maximumDrag = 130;
+const clickSuppressionDistance = 8;
+
+const interactiveElementSelector =
+  "button, a, dialog, input, textarea, select";
+
+export function isInteractiveTarget(target: EventTarget | null): boolean {
+  return (
+    target instanceof Element &&
+    target.closest(interactiveElementSelector) !== null
+  );
+}
 
 export function useSwipeGesture({
   enabled,
@@ -18,27 +29,42 @@ export function useSwipeGesture({
   const pointerId = useRef<number | null>(null);
   const startX = useRef(0);
   const startY = useRef(0);
+  const didDrag = useRef(false);
+  const suppressNextClick = useRef(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  function reset() {
+  function resetPointer() {
     pointerId.current = null;
+    didDrag.current = false;
     setDragOffset(0);
     setIsDragging(false);
   }
 
-  const onPointerDown: PointerEventHandler<HTMLDivElement> = (event) => {
-    const target = event.target as Element;
+  function rememberDrag(horizontal: number, vertical: number) {
+    if (Math.hypot(horizontal, vertical) > clickSuppressionDistance) {
+      didDrag.current = true;
+    }
+  }
 
-    if (
-      !enabled ||
-      !event.isPrimary ||
-      event.button !== 0 ||
-      target.closest("button, a, dialog, input, textarea, select")
-    ) {
+  function preserveClickSuppression() {
+    if (didDrag.current) {
+      suppressNextClick.current = true;
+    }
+  }
+
+  const onPointerDown: PointerEventHandler<HTMLDivElement> = (event) => {
+    if (!event.isPrimary || event.button !== 0) {
       return;
     }
 
+    suppressNextClick.current = false;
+
+    if (!enabled || isInteractiveTarget(event.target)) {
+      return;
+    }
+
+    didDrag.current = false;
     pointerId.current = event.pointerId;
     startX.current = event.clientX;
     startY.current = event.clientY;
@@ -53,13 +79,16 @@ export function useSwipeGesture({
 
     const horizontal = event.clientX - startX.current;
     const vertical = event.clientY - startY.current;
+    rememberDrag(horizontal, vertical);
 
     if (Math.abs(vertical) > Math.abs(horizontal) && Math.abs(vertical) > 12) {
+      preserveClickSuppression();
+
       if (event.currentTarget.hasPointerCapture(event.pointerId)) {
         event.currentTarget.releasePointerCapture(event.pointerId);
       }
 
-      reset();
+      resetPointer();
       return;
     }
 
@@ -72,6 +101,9 @@ export function useSwipeGesture({
     }
 
     const horizontal = event.clientX - startX.current;
+    const vertical = event.clientY - startY.current;
+    rememberDrag(horizontal, vertical);
+    preserveClickSuppression();
 
     if (horizontal <= -swipeThreshold) {
       onSwipeLeft();
@@ -83,24 +115,33 @@ export function useSwipeGesture({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
-    reset();
+    resetPointer();
   };
 
   const onPointerCancel: PointerEventHandler<HTMLDivElement> = (event) => {
     if (pointerId.current === event.pointerId) {
-      reset();
+      preserveClickSuppression();
+      resetPointer();
     }
   };
 
   const onLostPointerCapture: PointerEventHandler<HTMLDivElement> = (event) => {
     if (pointerId.current === event.pointerId) {
-      reset();
+      preserveClickSuppression();
+      resetPointer();
     }
   };
+
+  function consumeClickSuppression(): boolean {
+    const shouldSuppress = suppressNextClick.current;
+    suppressNextClick.current = false;
+    return shouldSuppress;
+  }
 
   return {
     dragOffset,
     isDragging,
+    consumeClickSuppression,
     gestureProps: {
       onPointerDown,
       onPointerMove,

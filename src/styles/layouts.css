@@ -203,7 +203,7 @@
     align-items: start;
   }
 
-  @media (min-width: 900px) {
+  @media (width >= 900px) {
     .contribution-piece--lifted-caption-postcard
       .contribution-lifted-caption__strip {
       justify-self: start;
@@ -299,7 +299,7 @@
     white-space: nowrap;
   }
 
-  @media (max-width: 899px) {
+  @media (width < 900px) {
     .contribution-piece--decoration-compact-ticket {
       padding: 0.35rem 0.25rem;
       font-size: clamp(0.48rem, 2.4vw, 0.62rem);
