@@ -19,7 +19,7 @@ export const stickyNotes = {
     {
       photoIndex: 1,
       variant: "polaroid",
-      captionLayer: "lifted",
+      captionLayer: { position: "top" },
       placement: {
         desktop: { top: "27%", right: "6%", width: "40%", height: "33%", rotate: 7, z: 6 },
         mobile: { top: "28%", right: "5%", width: "45%", height: "25%", rotate: 7, z: 6 },
@@ -51,9 +51,10 @@ export const stickyNotes = {
     {
       kind: "doodle",
       label: "remember this bit! ↗",
+      treatment: "memory-callout",
       placement: {
-        desktop: { top: "53%", left: "5%", width: "31%", rotate: -8, z: 8 },
-        mobile: { top: "48%", left: "4%", width: "39%", rotate: -8, z: 8 },
+        desktop: { top: "43%", left: "5%", width: "31%", rotate: -8, z: 8 },
+        mobile: { top: "43%", left: "2%", width: "52%", rotate: -8, z: 8 },
       },
     },
   ],

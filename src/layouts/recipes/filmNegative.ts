@@ -27,7 +27,7 @@ export const filmNegative = {
     {
       photoIndex: 2,
       variant: "film",
-      captionLayer: "lifted",
+      captionLayer: { position: "top" },
       placement: {
         desktop: { top: "43%", left: "28%", width: "44%", height: "29%", rotate: -1, z: 7 },
         mobile: { top: "37%", left: "25%", width: "52%", height: "24%", rotate: -1, z: 7 },
@@ -52,6 +52,7 @@ export const filmNegative = {
     {
       kind: "doodle",
       label: "keep the outtakes",
+      treatment: "dark-label",
       placement: {
         desktop: { top: "64%", right: "4%", width: "32%", rotate: -7, z: 9 },
         mobile: { top: "58%", right: "3%", width: "39%", rotate: -7, z: 9 },

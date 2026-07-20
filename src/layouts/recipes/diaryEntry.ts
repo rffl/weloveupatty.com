@@ -19,7 +19,7 @@ export const diaryEntry = {
     {
       photoIndex: 1,
       variant: "snapshot",
-      captionLayer: "lifted",
+      captionLayer: { position: "top" },
       placement: {
         desktop: { top: "25%", left: "10%", width: "38%", height: "29%", rotate: -6, z: 5 },
         mobile: { top: "27%", left: "6%", width: "43%", height: "23%", rotate: -6, z: 5 },
@@ -44,9 +44,10 @@ export const diaryEntry = {
     {
       kind: "doodle",
       label: "Dear diary…",
+      treatment: "diary-heading",
       placement: {
-        desktop: { top: "10%", left: "11%", width: "27%", rotate: -5, z: 8 },
-        mobile: { top: "11%", left: "10%", width: "34%", rotate: -5, z: 8 },
+        desktop: { top: "2%", right: "1%", width: "27%", rotate: -5, z: 8 },
+        mobile: { top: "2%", right: "1%", width: "27%", rotate: -5, z: 8 },
       },
     },
     {

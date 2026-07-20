@@ -80,8 +80,8 @@ export function ContributionLayout({
         const photo =
           contribution.photos[piece.photoIndex] ?? contribution.photos[0];
         const placement = piece.placement[mode];
-        const liftedCaption =
-          piece.captionLayer === "lifted" ? photo.caption : undefined;
+        const captionPosition = piece.captionLayer?.position;
+        const liftedCaption = captionPosition ? photo.caption : undefined;
         const captionZ =
           Math.max(
             placement.z ?? 1,
@@ -96,8 +96,8 @@ export function ContributionLayout({
             >
               <PhotoFrame
                 className={
-                  piece.captionLayer === "lifted"
-                    ? "photo-frame--caption-lifted"
+                  captionPosition
+                    ? `photo-frame--caption-lifted photo-frame--caption-lifted-${captionPosition}`
                     : undefined
                 }
                 eager={eagerPhotos}
@@ -106,10 +106,10 @@ export function ContributionLayout({
               />
             </div>
 
-            {liftedCaption ? (
+            {liftedCaption && captionPosition ? (
               <div
                 aria-hidden="true"
-                className={`contribution-piece contribution-piece--lifted-caption contribution-piece--lifted-caption-${piece.variant}`}
+                className={`contribution-piece contribution-piece--lifted-caption contribution-piece--lifted-caption-${captionPosition} contribution-piece--lifted-caption-${piece.variant}`}
                 style={pieceStyle(placement, captionZ)}
               >
                 <span className="contribution-lifted-caption__strip">
@@ -135,7 +135,11 @@ export function ContributionLayout({
 
       {recipe.decorations.map((piece, index) => (
         <Decoration
-          className="contribution-piece contribution-piece--decoration"
+          className={`contribution-piece contribution-piece--decoration${
+            piece.treatment
+              ? ` contribution-piece--decoration-${piece.treatment}`
+              : ""
+          }`}
           key={`${contribution.id}-decoration-${index}`}
           kind={piece.kind}
           label={piece.label}

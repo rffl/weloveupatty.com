@@ -19,7 +19,7 @@ export const finalLoveLetter = {
     {
       photoIndex: 1,
       variant: "polaroid",
-      captionLayer: "lifted",
+      captionLayer: { position: "top" },
       placement: {
         desktop: { top: "19%", right: "6%", width: "43%", height: "35%", rotate: 6, z: 6 },
         mobile: { top: "27%", right: "5%", width: "48%", height: "26%", rotate: 6, z: 6 },

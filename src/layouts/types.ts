@@ -5,6 +5,14 @@ import type { ContributionLayout } from "../content/types";
 
 export type ResponsiveMode = "desktop" | "mobile";
 export type PageSurface = "paper" | "light" | "graph" | "kraft" | "black";
+export type DecorationTreatment =
+  | "dark-label"
+  | "diary-heading"
+  | "compact-ticket"
+  | "memory-callout";
+export type LiftedCaptionLayer = Readonly<{
+  position: "top" | "bottom";
+}>;
 
 export type PiecePlacement = Readonly<{
   top?: string;
@@ -35,7 +43,7 @@ export type ResponsivePhotoPlacement = Readonly<{
 export type PhotoPiece = Readonly<{
   photoIndex: number;
   variant: PhotoFrameVariant;
-  captionLayer?: "lifted";
+  captionLayer?: LiftedCaptionLayer;
   placement: ResponsivePhotoPlacement;
 }>;
 
@@ -47,6 +55,7 @@ export type MessagePiece = Readonly<{
 export type DecorationPiece = Readonly<{
   kind: DecorationKind;
   label?: string;
+  treatment?: DecorationTreatment;
   placement: ResponsivePlacement;
 }>;
 

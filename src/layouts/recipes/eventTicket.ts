@@ -19,7 +19,7 @@ export const eventTicket = {
     {
       photoIndex: 1,
       variant: "polaroid",
-      captionLayer: "lifted",
+      captionLayer: { position: "top" },
       placement: {
         desktop: { top: "28%", right: "6%", width: "39%", height: "32%", rotate: 7, z: 6 },
         mobile: { top: "29%", right: "4%", width: "44%", height: "25%", rotate: 7, z: 6 },
@@ -37,9 +37,10 @@ export const eventTicket = {
     {
       kind: "ticket",
       label: "ADMIT TWO\nONE PERFECT NIGHT",
+      treatment: "compact-ticket",
       placement: {
-        desktop: { top: "8%", left: "46%", width: "42%", height: "12%", rotate: -4, z: 8 },
-        mobile: { top: "11%", right: "3%", width: "46%", height: "10%", rotate: -4, z: 8 },
+        desktop: { top: "3%", left: "3%", width: "30%", height: "10%", rotate: -4, z: 8 },
+        mobile: { top: "2.5%", left: "2%", width: "29%", height: "11%", rotate: -4, z: 8 },
       },
     },
     {

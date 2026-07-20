@@ -123,22 +123,23 @@
       -webkit-line-clamp: 2;
     }
 
-    .contribution-layout:is(
-        [data-layout="film-negative"],
-        [data-layout="sticky-notes"],
-        [data-layout="diary-entry"],
-        [data-layout="event-ticket"],
-        [data-layout="final-love-letter"]
-      )
-      .photo-frame--caption-lifted
-      .photo-frame__placeholder {
-      place-content: end center;
-      padding-block-end: clamp(0.3rem, 5cqh, 0.6rem);
-    }
+  }
+
+  .contribution-piece--photo .photo-frame.photo-frame--caption-lifted {
+    grid-template-rows: minmax(0, 1fr);
+    gap: 0;
   }
 
   .photo-frame--caption-lifted figcaption {
-    opacity: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .contribution-piece--lifted-caption {
@@ -198,25 +199,12 @@
     }
   }
 
-  .contribution-layout:is(
-      [data-layout="film-negative"],
-      [data-layout="sticky-notes"],
-      [data-layout="diary-entry"],
-      [data-layout="event-ticket"],
-      [data-layout="final-love-letter"]
-    )
-    .contribution-piece--lifted-caption {
+  .contribution-piece--lifted-caption-top {
     align-items: start;
   }
 
-  .contribution-layout[data-layout="diary-entry"]
-    .contribution-piece--lifted-caption {
-    padding-block-start: 0.1rem;
-  }
-
   @media (min-width: 900px) {
-    .contribution-layout[data-layout="postcard"]
-      .contribution-piece--lifted-caption-postcard
+    .contribution-piece--lifted-caption-postcard
       .contribution-lifted-caption__strip {
       justify-self: start;
       max-width: 40%;
@@ -282,52 +270,42 @@
     line-height: 1;
   }
 
-  .contribution-layout[data-layout="film-negative"]
-    .contribution-piece--decoration.decoration--doodle {
+  .contribution-piece--decoration-dark-label {
     color: var(--color-paper-light);
-    text-shadow: 0 1px 1px rgb(12 10 9 / 65%);
   }
 
-  .contribution-layout[data-layout="diary-entry"]
-    .contribution-piece--decoration.decoration--doodle {
-    top: 2% !important;
-    right: 1% !important;
-    left: auto !important;
-    width: 27% !important;
+  .contribution-piece--decoration-dark-label > span {
+    display: inline-block;
+    max-width: 100%;
+    padding: 0.18rem 0.48rem 0.25rem;
+    background:
+      repeating-linear-gradient(
+        4deg,
+        rgb(244 234 216 / 3%) 0 1px,
+        transparent 1px 7px
+      ),
+      #3a3734;
+    border: 1px solid rgb(244 234 216 / 18%);
+    box-shadow: var(--shadow-contact);
+    line-height: 1.05;
+  }
+
+  .contribution-piece--decoration-diary-heading {
     font-size: clamp(1.05rem, 4.8vw, 1.45rem);
     white-space: nowrap;
   }
 
-  .contribution-layout[data-layout="event-ticket"]
-    .contribution-piece--decoration.decoration--ticket {
-    top: 3% !important;
-    right: auto !important;
-    left: 3% !important;
-    width: 30% !important;
-    height: 10% !important;
+  .contribution-piece--decoration-compact-ticket {
     white-space: nowrap;
   }
 
-  .contribution-layout[data-layout="sticky-notes"]
-    .contribution-piece--decoration.decoration--doodle {
-    top: 43% !important;
-  }
-
   @media (max-width: 899px) {
-    .contribution-layout[data-layout="event-ticket"]
-      .contribution-piece--decoration.decoration--ticket {
-      top: 2.5% !important;
-      left: 2% !important;
-      width: 29% !important;
-      height: 11% !important;
+    .contribution-piece--decoration-compact-ticket {
       padding: 0.35rem 0.25rem;
       font-size: clamp(0.48rem, 2.4vw, 0.62rem);
     }
 
-    .contribution-layout[data-layout="sticky-notes"]
-      .contribution-piece--decoration.decoration--doodle {
-      left: 2% !important;
-      width: 52% !important;
+    .contribution-piece--decoration-memory-callout {
       font-size: clamp(1rem, 4.8vw, 1.45rem);
       line-height: 1.05;
       white-space: nowrap;

@@ -11,7 +11,7 @@ export const coffeeReceipt = {
     {
       photoIndex: 0,
       variant: "polaroid",
-      captionLayer: "lifted",
+      captionLayer: { position: "bottom" },
       placement: {
         desktop: {
           top: "11%",
@@ -34,7 +34,7 @@ export const coffeeReceipt = {
     {
       photoIndex: 1,
       variant: "snapshot",
-      captionLayer: "lifted",
+      captionLayer: { position: "bottom" },
       placement: {
         desktop: {
           top: "25%",

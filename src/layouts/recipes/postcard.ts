@@ -11,7 +11,7 @@ export const postcard = {
     {
       photoIndex: 0,
       variant: "postcard",
-      captionLayer: "lifted",
+      captionLayer: { position: "bottom" },
       placement: {
         desktop: {
           top: "15%",
