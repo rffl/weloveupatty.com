@@ -35,16 +35,16 @@
 
   .scrapbook-cover {
     opacity: 1;
-    transform: translateY(0) scale(1) !important;
-    transition-property: opacity, transform !important;
+    transform: translateX(0) scale(1) !important;
+    transition-property: opacity !important;
     transition-duration: 140ms !important;
     transition-timing-function: ease-out !important;
   }
 
   .scrapbook-cover[data-phase="opening"],
   .scrapbook-cover[data-phase="open"] {
-    opacity: 0;
-    transform: translateY(1px) scale(0.996) !important;
+    opacity: 0.88;
+    transform: translateX(-100%) scale(0.996) !important;
   }
 
   .page-turner__turning-leaf {

@@ -48,7 +48,8 @@ export const Cover = forwardRef<HTMLButtonElement, CoverProps>(function Cover(
   const finishTransition: TransitionEventHandler<HTMLElement> = (event) => {
     if (
       event.currentTarget !== event.target ||
-      event.propertyName !== "transform" ||
+      (event.propertyName !== "transform" &&
+        event.propertyName !== "opacity") ||
       (phase !== "opening" && phase !== "closing") ||
       settlingPhase.current !== phase
     ) {
@@ -66,6 +67,7 @@ export const Cover = forwardRef<HTMLButtonElement, CoverProps>(function Cover(
       aria-hidden={phase === "open" || undefined}
       className="scrapbook-cover"
       data-phase={phase}
+      inert={phase === "open"}
       onTransitionEnd={finishTransition}
     >
       <button
@@ -78,7 +80,7 @@ export const Cover = forwardRef<HTMLButtonElement, CoverProps>(function Cover(
           }
         }}
         ref={ref}
-        tabIndex={phase === "open" ? -1 : 0}
+        tabIndex={unavailable ? -1 : 0}
         type="button"
       >
         <span className="scrapbook-cover__stitched-border" aria-hidden="true" />
