@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import type { ResponsiveMode } from "../layouts/types";
 import {
@@ -7,6 +13,10 @@ import {
 } from "./pageModel";
 
 export type TurnDirection = "forward" | "backward";
+export type PreviousAction =
+  | "ignored"
+  | "page-turn-started"
+  | "cover-closed";
 
 type ActiveTurn = {
   id: number;
@@ -24,9 +34,12 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
   const [coverOpen, setCoverOpen] = useState(false);
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [activeTurn, setActiveTurn] = useState<ActiveTurn | null>(null);
+  const coverOpenRef = useRef(false);
+  const activePageIndexRef = useRef(0);
   const activeTurnId = useRef<number | null>(null);
   const nextTurnId = useRef(0);
   const transitionTimer = useRef<number | null>(null);
+  const previousMode = useRef(mode);
   const lastPageIndex = Math.max(0, pageCount - 1);
   const desktopSpreadCount = 1 + Math.ceil(Math.max(0, pageCount - 1) / 2);
 
@@ -46,10 +59,35 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
   }, []);
 
   const completeTurn = useCallback(() => {
-    if (activeTurn !== null) {
-      finishTurn(activeTurn.id);
+    const turnId = activeTurnId.current;
+
+    if (turnId !== null) {
+      finishTurn(turnId);
     }
-  }, [activeTurn, finishTurn]);
+  }, [finishTurn]);
+
+  useLayoutEffect(() => {
+    if (previousMode.current === mode) {
+      return;
+    }
+
+    previousMode.current = mode;
+
+    const turnId = activeTurnId.current;
+
+    if (turnId !== null) {
+      finishTurn(turnId);
+    }
+  }, [finishTurn, mode]);
+
+  useLayoutEffect(() => {
+    const nextIndex = Math.min(activePageIndexRef.current, lastPageIndex);
+
+    if (nextIndex !== activePageIndexRef.current) {
+      activePageIndexRef.current = nextIndex;
+      setActivePageIndex(nextIndex);
+    }
+  }, [lastPageIndex]);
 
   useEffect(() => {
     return () => {
@@ -62,72 +100,111 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
     };
   }, []);
 
-  function navigateToPage(target: number, direction: TurnDirection) {
-    const nextIndex = Math.max(0, Math.min(lastPageIndex, target));
+  const navigateToPage = useCallback(
+    (target: number, direction: TurnDirection) => {
+      const nextIndex = Math.max(0, Math.min(lastPageIndex, target));
 
-    if (
-      activeTurn !== null ||
-      activeTurnId.current !== null ||
-      nextIndex === activePageIndex
-    ) {
+      if (
+        activeTurnId.current !== null ||
+        nextIndex === activePageIndexRef.current
+      ) {
+        return;
+      }
+
+      const turnId = nextTurnId.current + 1;
+      nextTurnId.current = turnId;
+      activeTurnId.current = turnId;
+      activePageIndexRef.current = nextIndex;
+      setActiveTurn({ id: turnId, direction });
+      setActivePageIndex(nextIndex);
+      transitionTimer.current = window.setTimeout(() => {
+        finishTurn(turnId);
+      }, turnFallbackDelay);
+    },
+    [finishTurn, lastPageIndex],
+  );
+
+  const openCover = useCallback(() => {
+    coverOpenRef.current = true;
+    setCoverOpen(true);
+  }, []);
+
+  const next = useCallback(() => {
+    if (!coverOpenRef.current) {
+      openCover();
       return;
     }
 
-    const turnId = nextTurnId.current + 1;
-    nextTurnId.current = turnId;
-    activeTurnId.current = turnId;
-    setActiveTurn({ id: turnId, direction });
-    setActivePageIndex(nextIndex);
-    transitionTimer.current = window.setTimeout(() => {
-      finishTurn(turnId);
-    }, turnFallbackDelay);
-  }
-
-  function next() {
-    if (!coverOpen) {
-      setCoverOpen(true);
+    if (activeTurnId.current !== null) {
       return;
     }
 
     if (mode === "mobile") {
-      navigateToPage(activePageIndex + 1, "forward");
+      navigateToPage(activePageIndexRef.current + 1, "forward");
       return;
     }
 
-    const spread = desktopSpreadForPageIndex(activePageIndex);
+    const spread = desktopSpreadForPageIndex(activePageIndexRef.current);
 
     if (spread >= desktopSpreadCount - 1) {
       return;
     }
 
     navigateToPage(firstPageIndexForDesktopSpread(spread + 1), "forward");
-  }
+  }, [desktopSpreadCount, mode, navigateToPage, openCover]);
 
-  function previous() {
-    if (!coverOpen || activeTurn !== null || activeTurnId.current !== null) {
-      return;
+  const previous = useCallback((): PreviousAction => {
+    if (!coverOpenRef.current || activeTurnId.current !== null) {
+      return "ignored";
     }
 
-    if (activePageIndex === 0) {
+    if (activePageIndexRef.current === 0) {
+      coverOpenRef.current = false;
       setCoverOpen(false);
-      return;
+      return "cover-closed";
     }
 
     if (mode === "mobile") {
-      navigateToPage(activePageIndex - 1, "backward");
-      return;
+      navigateToPage(activePageIndexRef.current - 1, "backward");
+      return "page-turn-started";
     }
 
-    const spread = desktopSpreadForPageIndex(activePageIndex);
+    const spread = desktopSpreadForPageIndex(activePageIndexRef.current);
     navigateToPage(firstPageIndexForDesktopSpread(spread - 1), "backward");
-  }
+    return "page-turn-started";
+  }, [mode, navigateToPage]);
 
-  function goToPage(pageIndex: number) {
-    navigateToPage(
-      pageIndex,
-      pageIndex >= activePageIndex ? "forward" : "backward",
-    );
-  }
+  const goToPage = useCallback(
+    (pageIndex: number) => {
+      navigateToPage(
+        pageIndex,
+        pageIndex >= activePageIndexRef.current ? "forward" : "backward",
+      );
+    },
+    [navigateToPage],
+  );
+
+  const rememberPage = useCallback(
+    (pageIndex: number) => {
+      const nextIndex = Math.max(0, Math.min(lastPageIndex, pageIndex));
+
+      if (activeTurnId.current !== null) {
+        return;
+      }
+
+      if (nextIndex === activePageIndexRef.current) {
+        return;
+      }
+
+      activePageIndexRef.current = nextIndex;
+      setActivePageIndex(nextIndex);
+    },
+    [lastPageIndex],
+  );
+
+  useLayoutEffect(() => {
+    coverOpenRef.current = coverOpen;
+  }, [coverOpen]);
 
   const activeStep =
     mode === "desktop"
@@ -142,7 +219,7 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
 
   return {
     coverOpen,
-    openCover: () => setCoverOpen(true),
+    openCover,
     activePageIndex,
     activeStep,
     totalSteps,
@@ -154,5 +231,6 @@ export function usePageTurner({ pageCount, mode }: PageTurnerOptions) {
     next,
     previous,
     goToPage,
+    rememberPage,
   };
 }

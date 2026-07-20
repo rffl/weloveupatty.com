@@ -1,21 +1,124 @@
 @layer components {
-  .page-turner {
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 200;
+    padding: 0.65rem 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-paper-light);
+    box-shadow: var(--shadow-contact);
+    transform: translateY(-180%);
+    transition: transform 160ms ease;
+  }
+
+  .skip-link:focus {
+    transform: translateY(0) rotate(-1deg);
+  }
+
+  .scrapbook-experience {
+    position: relative;
+    display: grid;
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    place-items: center;
+    overflow: hidden;
+    padding: 1rem;
+  }
+
+  .scrapbook-experience:focus {
+    outline: 0;
+    box-shadow: none;
+  }
+
+  .scrapbook-stage {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    width: min(94vw, calc((100dvh - 7rem) * 1.66), 82.5rem);
+    grid-template-rows: auto auto;
+    justify-items: center;
+    gap: clamp(0.45rem, 1.2vh, 0.8rem);
+  }
+
+  .scrapbook-book {
     position: relative;
     width: 100%;
+    aspect-ratio: 1.66 / 1;
+    padding: 1.1%;
+    overflow: visible;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgb(255 255 255 / 3%) 0 1px,
+        transparent 1px 5px
+      ),
+      #493126;
+    border-radius: 0.45rem 0.8rem 0.8rem 0.45rem;
+    box-shadow:
+      var(--shadow-book),
+      inset 0 0 0 2px rgb(237 212 175 / 12%);
+    container-name: scrapbook-book;
+    container-type: size;
+    filter: drop-shadow(0 2rem 1.4rem rgb(23 12 8 / 28%));
+    transform-style: preserve-3d;
+  }
+
+  .scrapbook-book::after {
+    position: absolute;
+    top: 1.1%;
+    bottom: 1.1%;
+    left: 50%;
+    z-index: 45;
+    width: clamp(0.7rem, 1.8cqw, 1.45rem);
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgb(39 21 14 / 28%),
+      rgb(255 245 225 / 16%) 48%,
+      rgb(39 21 14 / 34%)
+    );
+    box-shadow: 0 0 0.7rem rgb(45 24 15 / 25%);
+    transform: translateX(-50%);
+  }
+
+  .scrapbook-page-region,
+  .page-turner,
+  .page-turner__content {
+    width: 100%;
     height: 100%;
+  }
+
+  .scrapbook-page-region {
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+    border-radius: 0.2rem;
+  }
+
+  .scrapbook-page-region[aria-hidden="true"] {
+    pointer-events: none;
+  }
+
+  .page-turner {
+    position: relative;
     touch-action: pan-y;
     user-select: none;
   }
 
   .page-turner__content {
-    width: 100%;
-    height: 100%;
     transform: translateX(calc(var(--drag-offset, 0px) * 0.12));
     transition: transform 180ms ease;
   }
 
   .page-turner[data-dragging] .page-turner__content {
     transition: none;
+  }
+
+  .page-turner[data-turn] .page-turner__content {
+    pointer-events: none;
   }
 
   .page-turner__turning-leaf {
@@ -27,15 +130,34 @@
     background:
       linear-gradient(
         90deg,
-        transparent,
+        rgb(255 249 235 / 30%),
         rgb(73 45 27 / 20%) 47%,
-        rgb(247 233 207 / 88%) 50%,
-        transparent 54%
+        rgb(247 233 207 / 92%) 50%,
+        rgb(105 73 45 / 12%) 100%
       ),
       #dfcba8;
     box-shadow: var(--shadow-lifted);
     transform-origin: left center;
-    animation: turn-forward var(--page-turn-duration) var(--page-turn-ease) both;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+    animation: turn-forward var(--page-turn-duration) var(--page-turn-ease)
+      both;
+  }
+
+  .page-turner__turning-leaf::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background:
+      linear-gradient(
+        90deg,
+        rgb(65 40 24 / 16%),
+        rgb(250 238 214 / 84%) 48%,
+        rgb(66 41 25 / 18%)
+      ),
+      #e6d4b6;
+    backface-visibility: hidden;
+    transform: rotateY(180deg);
   }
 
   .page-turner[data-turn="backward"] .page-turner__turning-leaf {
@@ -45,45 +167,561 @@
 
   @keyframes turn-forward {
     0% {
-      transform: perspective(1200px) rotateY(92deg);
-      opacity: 0;
+      opacity: 1;
+      transform: perspective(1200px) rotateY(0deg);
     }
 
-    15% {
+    82% {
       opacity: 1;
     }
 
     100% {
-      transform: perspective(1200px) rotateY(-92deg);
-      opacity: 0;
+      opacity: 0.08;
+      transform: perspective(1200px) rotateY(-178deg);
     }
   }
 
   @keyframes turn-backward {
     0% {
-      transform: perspective(1200px) rotateY(-92deg);
-      opacity: 0;
+      opacity: 1;
+      transform: perspective(1200px) rotateY(0deg);
     }
 
-    15% {
+    82% {
       opacity: 1;
     }
 
     100% {
-      transform: perspective(1200px) rotateY(92deg);
-      opacity: 0;
+      opacity: 0.08;
+      transform: perspective(1200px) rotateY(178deg);
     }
   }
 
-  .scrapbook-controls {
+  .desktop-spread {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    overflow: hidden;
+    border-radius: 0.2rem;
+  }
+
+  .desktop-spread[data-single] .scrapbook-page {
+    grid-column: 1 / -1;
+  }
+
+  .mobile-page,
+  .scrapbook-page {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .scrapbook-page {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-paper);
+    box-shadow: inset 0 0 1rem rgb(84 52 29 / 13%);
+    container-name: scrapbook-page;
+    container-type: size;
+  }
+
+  .scrapbook-page[data-side="left"] {
+    border-radius: 0.22rem 0.05rem 0.05rem 0.22rem;
+    box-shadow:
+      inset -1rem 0 1.2rem rgb(70 42 25 / 11%),
+      inset 0 0 1rem rgb(84 52 29 / 9%);
+  }
+
+  .scrapbook-page[data-side="right"] {
+    border-radius: 0.05rem 0.22rem 0.22rem 0.05rem;
+    box-shadow:
+      inset 1rem 0 1.2rem rgb(70 42 25 / 11%),
+      inset 0 0 1rem rgb(84 52 29 / 9%);
+  }
+
+  .scrapbook-cover-guard {
     position: absolute;
-    right: 50%;
-    bottom: clamp(0.35rem, 1.6vh, 1rem);
+    inset: 0;
+    z-index: 68;
+    cursor: wait;
+    pointer-events: auto;
+  }
+
+  .scrapbook-cover {
+    position: absolute;
+    inset: 0;
+    z-index: 70;
+    border-radius: 0.45rem 0.8rem 0.8rem 0.45rem;
+    box-shadow: var(--shadow-book);
+    transform: perspective(1800px) rotateY(0deg);
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform 780ms cubic-bezier(0.2, 0.68, 0.18, 1);
+    will-change: transform;
+  }
+
+  .scrapbook-cover[data-phase="opening"],
+  .scrapbook-cover[data-phase="open"] {
+    transform: perspective(1800px) rotateY(-168deg);
+  }
+
+  .scrapbook-cover[data-phase="opening"],
+  .scrapbook-cover[data-phase="closing"] {
+    pointer-events: none;
+  }
+
+  .scrapbook-cover[data-phase="open"] {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .scrapbook-cover__face {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    backface-visibility: hidden;
+  }
+
+  .scrapbook-cover__button {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    padding: clamp(1rem, 4cqh, 4rem);
+    overflow: hidden;
+    color: #f1dfc2;
+    border: 0;
+    background:
+      radial-gradient(
+        circle at 72% 19%,
+        rgb(255 237 201 / 9%),
+        transparent 22%
+      ),
+      repeating-linear-gradient(
+        7deg,
+        rgb(255 255 255 / 2%) 0 1px,
+        transparent 1px 4px
+      ),
+      #315760;
+    box-shadow:
+      inset 1rem 0 1.4rem rgb(20 29 29 / 24%),
+      inset 0 0 0 0.35rem rgb(33 45 43 / 36%);
+    cursor: pointer;
+  }
+
+  .scrapbook-cover__button[aria-disabled="true"] {
+    cursor: wait;
+  }
+
+  .scrapbook-cover__button::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 3.2%;
+    width: 3.4%;
+    content: "";
+    border-right: 1px solid rgb(242 218 180 / 16%);
+    border-left: 1px solid rgb(27 42 42 / 30%);
+    background: rgb(34 66 72 / 55%);
+  }
+
+  .scrapbook-cover__stitched-border {
+    position: absolute;
+    inset: 3.5%;
+    border: 2px dashed rgb(238 213 175 / 42%);
+    border-radius: 0.2rem;
+    pointer-events: none;
+  }
+
+  .scrapbook-cover__label {
+    position: relative;
+    display: grid;
+    width: min(72%, 36rem);
+    gap: clamp(0.35rem, 1.15cqh, 0.7rem);
+    padding: clamp(1.15rem, 5cqh, 3.4rem);
+    color: var(--color-ink);
+    text-align: center;
+    background:
+      repeating-linear-gradient(
+        3deg,
+        transparent 0 6px,
+        rgb(75 52 34 / 3%) 7px
+      ),
+      #e7d1aa;
+    box-shadow: var(--shadow-lifted);
+    transform: rotate(-1.2deg) translateZ(1px);
+  }
+
+  .scrapbook-cover__label::before,
+  .scrapbook-cover__label::after {
+    position: absolute;
+    top: -0.65rem;
+    width: clamp(3.4rem, 8cqw, 5.5rem);
+    height: clamp(0.85rem, 2cqh, 1.35rem);
+    content: "";
+    background: rgb(233 211 163 / 68%);
+  }
+
+  .scrapbook-cover__label::before {
+    left: 8%;
+    transform: rotate(-5deg);
+  }
+
+  .scrapbook-cover__label::after {
+    right: 8%;
+    transform: rotate(5deg);
+  }
+
+  .scrapbook-cover__eyebrow {
+    font-family: var(--font-typewriter);
+    font-size: clamp(0.55rem, 1.1cqw, 0.9rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .scrapbook-cover__label strong {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5.5cqw, 5.2rem);
+    font-weight: 400;
+    line-height: 0.86;
+  }
+
+  .scrapbook-cover__label > span:last-child {
+    font-family: var(--font-hand);
+    font-size: clamp(0.88rem, 2cqw, 1.7rem);
+    line-height: 1.08;
+  }
+
+  .scrapbook-cover__prompt {
+    position: absolute;
+    right: 8%;
+    bottom: 7%;
+    font-family: var(--font-hand);
+    font-size: clamp(0.9rem, 1.8cqw, 1.5rem);
+    transform: rotate(-5deg);
+  }
+
+  .scrapbook-cover__stamp {
+    top: 8%;
+    right: 8%;
+    width: clamp(3.2rem, 8.5cqw, 7rem);
+    height: clamp(2.4rem, 6cqh, 5rem);
+    --rotation: 8deg;
+  }
+
+  .scrapbook-cover__heart {
+    bottom: 8%;
+    left: 9%;
+    width: clamp(1.3rem, 2.5cqw, 2rem);
+    --rotation: -8deg;
+  }
+
+  .scrapbook-cover__inside {
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(
+        88deg,
+        rgb(255 255 255 / 3%) 0 1px,
+        transparent 1px 5px
+      ),
+      #294b52;
+    box-shadow:
+      inset -1.2rem 0 1.5rem rgb(12 26 28 / 24%),
+      inset 0 0 0 0.35rem rgb(26 42 42 / 32%);
+    transform: rotateY(180deg);
+  }
+
+  .scrapbook-cover__inside::before {
+    position: absolute;
+    inset: 4%;
+    content: "";
+    border: 2px dashed rgb(238 213 175 / 25%);
+  }
+
+  .scrapbook-cover__inside-pocket {
+    position: absolute;
+    right: 17%;
+    bottom: 18%;
+    display: grid;
+    width: 48%;
+    gap: clamp(0.2rem, 0.8cqh, 0.5rem);
+    padding: clamp(0.8rem, 3.2cqh, 2rem);
+    color: var(--color-ink);
+    background:
+      linear-gradient(155deg, transparent 0 12%, rgb(88 59 31 / 7%) 12.5%),
+      #dfc89e;
+    box-shadow: var(--shadow-lifted);
+    text-align: center;
+    transform: rotate(2deg);
+  }
+
+  .scrapbook-cover__inside-pocket i,
+  .scrapbook-cover__inside-pocket small {
+    font-family: var(--font-typewriter);
+    font-size: clamp(0.45rem, 0.9cqw, 0.75rem);
+    font-style: normal;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .scrapbook-cover__inside-pocket strong {
+    font-family: var(--font-hand);
+    font-size: clamp(1.2rem, 3cqw, 2.5rem);
+    line-height: 0.95;
+  }
+
+  .scrapbook-cover__inside-tape {
+    position: absolute;
+    right: 31%;
+    bottom: 48%;
+    width: 18%;
+    height: 3.5%;
+    background: rgb(226 207 163 / 68%);
+    box-shadow: 0 1px 2px rgb(22 22 15 / 18%);
+    transform: rotate(-3deg);
+  }
+
+  .scrapbook-cover__inside-stitch {
+    position: absolute;
+    top: 8%;
+    bottom: 8%;
+    left: 7%;
+    border-left: 2px dashed rgb(238 213 175 / 28%);
+  }
+
+  .opening-page,
+  .closing-page {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .opening-page {
+    display: grid;
+    place-items: center;
+    padding: clamp(1.5rem, 6cqh, 5.5rem);
+  }
+
+  .opening-page__copy {
+    position: relative;
+    z-index: 5;
+    display: grid;
+    width: min(69%, 48rem);
+    justify-items: center;
+    text-align: center;
+    transform: rotate(-0.6deg);
+  }
+
+  .opening-page__copy > p:first-child {
+    margin: 0 0 clamp(0.35rem, 1.1cqh, 0.8rem);
+    font-family: var(--font-typewriter);
+    font-size: clamp(0.52rem, 1cqw, 0.9rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .opening-page h1 {
+    max-width: 16ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 5.8cqw, 5.8rem);
+    font-weight: 400;
+    line-height: 0.88;
+  }
+
+  .opening-page__underline {
+    width: 48%;
+    height: clamp(0.2rem, 0.7cqh, 0.45rem);
+    margin: clamp(0.35rem, 1.1cqh, 0.8rem) 0;
+    background: var(--color-postmark-red);
+    clip-path: polygon(
+      0 42%,
+      18% 30%,
+      39% 55%,
+      61% 35%,
+      81% 48%,
+      100% 31%,
+      98% 70%,
+      72% 61%,
+      49% 76%,
+      22% 64%,
+      2% 78%
+    );
+  }
+
+  .opening-page__message {
+    max-width: 48ch;
+    margin: 0;
+    font-family: var(--font-hand);
+    font-size: clamp(1rem, 2.1cqw, 1.85rem);
+    line-height: 1.22;
+  }
+
+  .opening-page__route {
+    position: absolute;
+    right: 8%;
+    bottom: 8%;
+    left: 8%;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--color-tram-blue);
+    font-family: var(--font-typewriter);
+    font-size: clamp(0.42rem, 0.75cqw, 0.7rem);
+  }
+
+  .opening-page__route i {
+    flex: 1;
+    height: 2px;
+    border-top: 2px dashed currentColor;
+  }
+
+  .opening-page__route span::before {
+    display: inline-block;
+    width: clamp(0.35rem, 0.7cqw, 0.55rem);
+    height: clamp(0.35rem, 0.7cqw, 0.55rem);
+    margin-right: 0.25rem;
+    content: "";
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: var(--color-paper-light);
+  }
+
+  .opening-page__tape {
+    top: 8%;
+    left: 38%;
+    width: 18%;
+    --rotation: -2deg;
+  }
+
+  .opening-page__stamp {
+    top: 9%;
+    right: 7%;
+    width: 16%;
+    height: 12%;
+    --rotation: 8deg;
+  }
+
+  .opening-page__map {
+    bottom: 15%;
+    left: 6%;
+    width: 18%;
+    height: 21%;
+    --rotation: -7deg;
+  }
+
+  .opening-page__doodle {
+    right: 7%;
+    bottom: 16%;
+    width: 17%;
+    --rotation: 5deg;
+  }
+
+  .closing-page {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: center;
+    padding: clamp(0.65rem, 2.8cqh, 2.25rem);
+  }
+
+  .closing-page__letter {
+    position: relative;
+    z-index: 5;
+    display: grid;
+    width: 80%;
+    max-height: 100%;
+    gap: clamp(0.3rem, 1.1cqh, 0.85rem);
+    align-self: center;
+    padding: clamp(0.85rem, 3cqw, 2rem);
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent 0 26px,
+        rgb(70 105 118 / 13%) 27px 28px
+      ),
+      #f1e6cf;
+    box-shadow: var(--shadow-lifted);
+    transform: rotate(-1.4deg);
+  }
+
+  .closing-page__eyebrow {
+    margin: 0;
+    font-family: var(--font-typewriter);
+    font-size: clamp(0.44rem, 1.2cqw, 0.68rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .closing-page h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 6.2cqw, 3.7rem);
+    font-weight: 400;
+    line-height: 0.9;
+  }
+
+  .closing-page__letter > p:not(.closing-page__eyebrow) {
+    margin: 0;
+    font-family: var(--font-hand);
+    font-size: clamp(0.92rem, 3.5cqw, 1.45rem);
+    line-height: 1.18;
+  }
+
+  .closing-page__letter strong {
+    justify-self: end;
+    font-family: var(--font-hand);
+    font-size: clamp(1.05rem, 4cqw, 1.85rem);
+  }
+
+  .closing-page__postscript {
+    position: relative;
+    z-index: 8;
+    justify-self: end;
+    max-width: 58%;
+    margin: clamp(0.15rem, 0.7cqh, 0.45rem) 4% 0 0;
+    font-family: var(--font-hand);
+    font-size: clamp(0.72rem, 2.4cqw, 1.05rem);
+    line-height: 1.05;
+    text-align: right;
+    transform: rotate(-3deg);
+  }
+
+  .closing-page__tape {
+    top: 7%;
+    left: 34%;
+    z-index: 9;
+    width: 30%;
+    --rotation: 1deg;
+  }
+
+  .closing-page__flower {
+    right: 3%;
+    bottom: 4%;
+    width: 16%;
+    height: 20%;
+    --rotation: -13deg;
+  }
+
+  .closing-page__heart {
+    top: 6%;
+    right: 7%;
+    width: 10%;
+    --rotation: 8deg;
+  }
+
+  .scrapbook-controls {
+    position: relative;
     z-index: 80;
     display: flex;
-    align-items: end;
-    gap: clamp(0.4rem, 2vw, 1rem);
-    transform: translateX(50%);
+    width: min(100%, 30rem);
+    min-height: 3rem;
+    align-items: start;
+    justify-content: center;
+    gap: clamp(0.45rem, 2vw, 1rem);
   }
 
   .scrapbook-control {
@@ -110,11 +748,16 @@
     opacity: 0.38;
   }
 
+  .scrapbook-control[aria-disabled="true"]:not(:disabled) {
+    cursor: wait;
+    opacity: 0.58;
+  }
+
   .scrapbook-progress {
     display: grid;
     min-width: 4.2rem;
     margin: 0;
-    padding: 0.42rem 0.55rem 1rem;
+    padding: 0.42rem 0.55rem 0.72rem;
     color: var(--color-paper-light);
     text-align: center;
     background: var(--color-postmark-red);
@@ -132,17 +775,380 @@
     font-size: 0.68rem;
   }
 
+  .table-scatter,
+  .table-flower {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .table-scatter {
+    inset: 0;
+    z-index: 2;
+  }
+
+  .table-scatter__tram-ticket {
+    position: absolute;
+    top: 5%;
+    left: 3%;
+    padding: 0.75rem 1.2rem;
+    font-family: var(--font-typewriter);
+    font-size: 0.65rem;
+    background: #d9aa54;
+    box-shadow: var(--shadow-contact);
+    transform: rotate(-12deg);
+  }
+
+  .table-scatter__coffee-ring {
+    position: absolute;
+    right: 3%;
+    bottom: 4%;
+    width: clamp(5rem, 10vw, 8rem);
+    aspect-ratio: 1;
+    border: clamp(0.35rem, 0.7vw, 0.6rem) solid rgb(80 42 22 / 28%);
+    border-radius: 50%;
+    filter: blur(0.3px);
+    transform: scaleY(0.9) rotate(8deg);
+  }
+
+  .table-scatter__pencil {
+    position: absolute;
+    top: 7%;
+    right: 4%;
+    color: rgb(245 223 190 / 68%);
+    font-family: var(--font-hand);
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    transform: rotate(8deg);
+  }
+
+  .table-flower {
+    bottom: 5%;
+    left: 3%;
+    z-index: 3;
+    width: 5rem;
+    height: 7rem;
+    --rotation: 18deg;
+  }
+
+  .scrapbook-experience[data-mode="desktop"]
+    .page-turner[data-turn="forward"]
+    .page-turner__turning-leaf {
+    right: 0;
+    left: 50%;
+  }
+
+  .scrapbook-experience[data-mode="desktop"]
+    .page-turner[data-turn="backward"]
+    .page-turner__turning-leaf {
+    right: 50%;
+    left: 0;
+  }
+
+  /* Book-relative type keeps every collage legible when a short viewport makes
+     the held page physically narrow (for example, a phone in landscape). */
+  .scrapbook-page .contribution-piece--name {
+    padding: clamp(0.22rem, 1.3cqw, 0.7rem);
+  }
+
+  .scrapbook-page .contribution-name__from {
+    font-size: clamp(0.42rem, 1.35cqw, 0.64rem);
+  }
+
+  .scrapbook-page .contribution-name {
+    font-size: clamp(1rem, 6cqw, 2.45rem);
+  }
+
+  .scrapbook-page .openable-note {
+    gap: clamp(0.16rem, 1.4cqw, 0.5rem);
+    padding: clamp(0.55rem, 4cqw, 1.45rem);
+  }
+
+  .scrapbook-page .openable-note--notebook,
+  .scrapbook-page .openable-note--diary {
+    padding-inline-start: clamp(1.7rem, 11cqw, 3.5rem);
+  }
+
+  .scrapbook-page .openable-note__eyebrow,
+  .scrapbook-page .openable-note__hint {
+    font-size: clamp(0.43rem, 1.55cqw, 0.68rem);
+  }
+
+  .scrapbook-page .openable-note__name {
+    font-size: clamp(1.15rem, 6.4cqw, 2.35rem);
+  }
+
+  .scrapbook-page .openable-note__preview {
+    font-size: clamp(0.88rem, 4.25cqw, 1.5rem);
+  }
+
+  .scrapbook-page .photo-frame__placeholder strong {
+    font-size: clamp(0.88rem, 6cqw, 2rem);
+  }
+
+  .scrapbook-page .photo-frame__placeholder small {
+    font-size: clamp(0.44rem, 1.65cqw, 0.7rem);
+  }
+
+  .scrapbook-page .contribution-piece--decoration-diary-heading,
+  .scrapbook-page .contribution-piece--decoration-memory-callout {
+    font-size: clamp(0.82rem, 5cqw, 1.4rem);
+  }
+
   @media (width < 900px) {
+    .scrapbook-experience {
+      padding: 0.7rem;
+    }
+
+    .scrapbook-stage {
+      width: min(92vw, calc((100dvh - 6rem) * 0.72), 27rem);
+      gap: clamp(0.38rem, 1vh, 0.62rem);
+    }
+
+    .scrapbook-book {
+      aspect-ratio: 0.72 / 1;
+      padding: 2.2%;
+      border-radius: 0.42rem 0.65rem 0.65rem 0.42rem;
+    }
+
+    .scrapbook-book::after {
+      top: 2.2%;
+      bottom: 2.2%;
+      left: 2.3%;
+      width: clamp(0.38rem, 2.8cqw, 0.7rem);
+      background: linear-gradient(
+        90deg,
+        rgb(39 21 14 / 32%),
+        rgb(255 245 225 / 13%),
+        rgb(39 21 14 / 26%)
+      );
+    }
+
+    .mobile-page {
+      overflow: hidden;
+      border-radius: 0.16rem;
+    }
+
+    .scrapbook-cover__label {
+      width: 79%;
+      gap: clamp(0.28rem, 1.1cqh, 0.55rem);
+      padding: clamp(0.85rem, 4.2cqh, 2.1rem) clamp(0.7rem, 5cqw, 1.1rem);
+    }
+
+    .scrapbook-cover__eyebrow {
+      font-size: clamp(0.44rem, 2.5cqw, 0.68rem);
+    }
+
+    .scrapbook-cover__label strong {
+      font-size: clamp(2rem, 15cqw, 4.4rem);
+    }
+
+    .scrapbook-cover__label > span:last-child {
+      font-size: clamp(0.78rem, 4.5cqw, 1.35rem);
+    }
+
+    .scrapbook-cover__prompt {
+      right: 7%;
+      bottom: 5%;
+      font-size: clamp(0.75rem, 4.2cqw, 1.15rem);
+    }
+
+    .scrapbook-cover__stamp {
+      width: 23%;
+      height: 10%;
+    }
+
+    .scrapbook-cover__inside-pocket {
+      right: 12%;
+      bottom: 22%;
+      width: 66%;
+    }
+
+    .scrapbook-cover__inside-pocket strong {
+      font-size: clamp(1rem, 7cqw, 1.8rem);
+    }
+
+    .scrapbook-cover__inside-pocket i,
+    .scrapbook-cover__inside-pocket small {
+      font-size: clamp(0.4rem, 2.1cqw, 0.6rem);
+    }
+
+    .scrapbook-cover__inside-tape {
+      right: 34%;
+      bottom: 50%;
+      width: 24%;
+    }
+
+    .opening-page {
+      padding: clamp(0.85rem, 4cqh, 1.35rem);
+    }
+
+    .opening-page__copy {
+      width: 86%;
+    }
+
+    .opening-page__copy > p:first-child {
+      font-size: clamp(0.42rem, 2.1cqw, 0.62rem);
+    }
+
+    .opening-page h1 {
+      font-size: clamp(1.75rem, 12cqw, 3.7rem);
+    }
+
+    .opening-page__message {
+      font-size: clamp(0.88rem, 5cqw, 1.45rem);
+      line-height: 1.16;
+    }
+
+    .opening-page__route {
+      right: 6%;
+      bottom: 5%;
+      left: 6%;
+      align-items: start;
+      font-size: clamp(0.35rem, 1.65cqw, 0.48rem);
+    }
+
+    .opening-page__route span {
+      max-width: 7ch;
+    }
+
+    .opening-page__map {
+      bottom: 15%;
+      width: 26%;
+      height: 15%;
+    }
+
+    .opening-page__stamp {
+      width: 25%;
+      height: 10%;
+    }
+
+    .opening-page__doodle {
+      right: 4%;
+      bottom: 18%;
+      width: 28%;
+    }
+
+    .closing-page {
+      padding: clamp(0.45rem, 2.4cqh, 1rem);
+    }
+
+    .closing-page__letter {
+      width: 86%;
+      gap: clamp(0.24rem, 1cqh, 0.55rem);
+      padding: clamp(0.62rem, 4.4cqw, 1.15rem);
+    }
+
+    .closing-page h2 {
+      font-size: clamp(1.55rem, 9.5cqw, 3rem);
+    }
+
+    .closing-page__letter > p:not(.closing-page__eyebrow) {
+      font-size: clamp(0.8rem, 4.2cqw, 1.25rem);
+      line-height: 1.13;
+    }
+
+    .closing-page__letter strong {
+      font-size: clamp(0.95rem, 5.2cqw, 1.6rem);
+    }
+
+    .closing-page__postscript {
+      max-width: 62%;
+      font-size: clamp(0.64rem, 3.2cqw, 0.9rem);
+    }
+
     .scrapbook-controls {
-      width: calc(100% - 1rem);
+      width: 100%;
+      min-height: 2.8rem;
       justify-content: space-between;
     }
 
+    .scrapbook-control {
+      min-width: clamp(4.15rem, 25cqw, 5.1rem);
+      padding: 0.52rem 0.58rem;
+      font-size: clamp(0.58rem, 3.3vw, 0.72rem);
+    }
+
     .scrapbook-progress {
-      position: absolute;
-      right: 50%;
-      bottom: 0;
-      transform: translateX(50%) rotate(-1deg);
+      min-width: clamp(3.75rem, 20cqw, 4.2rem);
+      padding: 0.34rem 0.42rem 0.58rem;
+    }
+
+    .table-scatter__tram-ticket {
+      top: 2%;
+      left: -4%;
+      transform: rotate(-15deg) scale(0.8);
+    }
+
+    .table-scatter__pencil {
+      top: 2%;
+      right: -2%;
+    }
+
+    .table-flower {
+      bottom: 1%;
+      left: -2%;
+      transform: scale(0.8) rotate(18deg);
+    }
+  }
+
+  @media (width < 900px) and (height < 520px) {
+    .scrapbook-stage {
+      width: min(92vw, calc((100dvh - 5.6rem) * 0.72), 27rem);
+    }
+
+    .scrapbook-cover__label {
+      width: 82%;
+      padding-block: 0.75rem;
+    }
+
+    .opening-page h1 {
+      font-size: clamp(1.6rem, 11cqw, 2.5rem);
+    }
+
+    .opening-page__message {
+      font-size: clamp(0.78rem, 4.5cqw, 1rem);
+      line-height: 1.12;
+    }
+
+    .opening-page__route {
+      bottom: 3%;
+    }
+
+    .closing-page__letter {
+      width: 88%;
+      padding: 0.58rem;
+    }
+
+    .closing-page h2 {
+      font-size: clamp(1.4rem, 8.8cqw, 2rem);
+    }
+
+    .closing-page__letter > p:not(.closing-page__eyebrow) {
+      font-size: clamp(0.74rem, 3.9cqw, 0.9rem);
+    }
+
+    .closing-page__postscript {
+      font-size: clamp(0.58rem, 2.9cqw, 0.75rem);
+    }
+
+    .table-scatter__coffee-ring,
+    .table-flower {
+      opacity: 0.6;
+    }
+  }
+
+  @media (width <= 340px) {
+    .scrapbook-controls {
+      gap: 0.28rem;
+    }
+
+    .scrapbook-control {
+      min-width: 4rem;
+      padding-inline: 0.42rem;
+      font-size: 0.58rem;
+    }
+
+    .scrapbook-progress {
+      min-width: 3.45rem;
     }
   }
 }

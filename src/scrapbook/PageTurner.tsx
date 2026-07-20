@@ -66,7 +66,7 @@ export function PageTurner({
   }, [direction, isTurning, onTurnComplete]);
 
   const onSurfaceClickCapture: MouseEventHandler<HTMLDivElement> = (event) => {
-    if (consumeClickSuppression()) {
+    if (consumeClickSuppression(event.detail !== 0)) {
       event.preventDefault();
       event.stopPropagation();
     }

@@ -17,13 +17,26 @@ export function ScrapbookControls({
   onPrevious,
   onNext,
 }: ScrapbookControlsProps) {
+  const previousUnavailable = !canPrevious || isTurning;
+  const nextUnavailable = !canNext || isTurning;
+
   return (
-    <nav className="scrapbook-controls" aria-label="Scrapbook pages">
+    <nav
+      aria-busy={isTurning || undefined}
+      aria-label="Scrapbook pages"
+      className="scrapbook-controls"
+      data-turning={isTurning || undefined}
+    >
       <button
         type="button"
         className="scrapbook-control scrapbook-control--previous"
-        onClick={onPrevious}
-        disabled={!canPrevious || isTurning}
+        aria-disabled={previousUnavailable}
+        disabled={!canPrevious}
+        onClick={() => {
+          if (!previousUnavailable) {
+            onPrevious();
+          }
+        }}
       >
         <span aria-hidden="true">←</span> Back
       </button>
@@ -36,8 +49,13 @@ export function ScrapbookControls({
       <button
         type="button"
         className="scrapbook-control scrapbook-control--next"
-        onClick={onNext}
-        disabled={!canNext || isTurning}
+        aria-disabled={nextUnavailable}
+        disabled={!canNext}
+        onClick={() => {
+          if (!nextUnavailable) {
+            onNext();
+          }
+        }}
       >
         Next <span aria-hidden="true">→</span>
       </button>

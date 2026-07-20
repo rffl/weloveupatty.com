@@ -132,10 +132,10 @@ export function useSwipeGesture({
     }
   };
 
-  function consumeClickSuppression(): boolean {
+  function consumeClickSuppression(pointerOriginated: boolean): boolean {
     const shouldSuppress = suppressNextClick.current;
     suppressNextClick.current = false;
-    return shouldSuppress;
+    return pointerOriginated && shouldSuppress;
   }
 
   return {
