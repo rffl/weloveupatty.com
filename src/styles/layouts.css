@@ -122,6 +122,19 @@
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
     }
+
+    .contribution-layout:is(
+        [data-layout="film-negative"],
+        [data-layout="sticky-notes"],
+        [data-layout="diary-entry"],
+        [data-layout="event-ticket"],
+        [data-layout="final-love-letter"]
+      )
+      .photo-frame--caption-lifted
+      .photo-frame__placeholder {
+      place-content: end center;
+      padding-block-end: clamp(0.3rem, 5cqh, 0.6rem);
+    }
   }
 
   .photo-frame--caption-lifted figcaption {
@@ -267,6 +280,58 @@
     padding: clamp(0.2rem, 1.5vw, 0.4rem);
     font-size: clamp(0.48rem, 1.5vw, 0.65rem);
     line-height: 1;
+  }
+
+  .contribution-layout[data-layout="film-negative"]
+    .contribution-piece--decoration.decoration--doodle {
+    color: var(--color-paper-light);
+    text-shadow: 0 1px 1px rgb(12 10 9 / 65%);
+  }
+
+  .contribution-layout[data-layout="diary-entry"]
+    .contribution-piece--decoration.decoration--doodle {
+    top: 2% !important;
+    right: 1% !important;
+    left: auto !important;
+    width: 27% !important;
+    font-size: clamp(1.05rem, 4.8vw, 1.45rem);
+    white-space: nowrap;
+  }
+
+  .contribution-layout[data-layout="event-ticket"]
+    .contribution-piece--decoration.decoration--ticket {
+    top: 3% !important;
+    right: auto !important;
+    left: 3% !important;
+    width: 30% !important;
+    height: 10% !important;
+    white-space: nowrap;
+  }
+
+  .contribution-layout[data-layout="sticky-notes"]
+    .contribution-piece--decoration.decoration--doodle {
+    top: 43% !important;
+  }
+
+  @media (max-width: 899px) {
+    .contribution-layout[data-layout="event-ticket"]
+      .contribution-piece--decoration.decoration--ticket {
+      top: 2.5% !important;
+      left: 2% !important;
+      width: 29% !important;
+      height: 11% !important;
+      padding: 0.35rem 0.25rem;
+      font-size: clamp(0.48rem, 2.4vw, 0.62rem);
+    }
+
+    .contribution-layout[data-layout="sticky-notes"]
+      .contribution-piece--decoration.decoration--doodle {
+      left: 2% !important;
+      width: 52% !important;
+      font-size: clamp(1rem, 4.8vw, 1.45rem);
+      line-height: 1.05;
+      white-space: nowrap;
+    }
   }
 
   .contribution-layout[data-layout="torn-notebook"]::before,
