@@ -5,7 +5,7 @@ export const filmNegative = {
   surface: "black",
   namePlacement: {
     desktop: { top: "6%", left: "7%", width: "44%", rotate: -2, z: 9 },
-    mobile: { top: "5%", left: "7%", width: "61%", rotate: -2, z: 9 },
+    mobile: { top: "4%", left: "7%", width: "61%", rotate: -2, z: 9 },
   },
   photos: [
     {
@@ -13,7 +13,7 @@ export const filmNegative = {
       variant: "film",
       placement: {
         desktop: { top: "17%", left: "5%", width: "43%", height: "29%", rotate: -4, z: 5 },
-        mobile: { top: "16%", left: "4%", width: "49%", height: "24%", rotate: -5, z: 5 },
+        mobile: { top: "13%", left: "4%", width: "49%", height: "18%", rotate: -5, z: 5 },
       },
     },
     {
@@ -21,7 +21,7 @@ export const filmNegative = {
       variant: "film",
       placement: {
         desktop: { top: "13%", right: "5%", width: "43%", height: "29%", rotate: 4, z: 6 },
-        mobile: { top: "18%", right: "4%", width: "49%", height: "24%", rotate: 5, z: 6 },
+        mobile: { top: "15%", right: "4%", width: "49%", height: "18%", rotate: 5, z: 6 },
       },
     },
     {
@@ -30,7 +30,7 @@ export const filmNegative = {
       captionLayer: { position: "top" },
       placement: {
         desktop: { top: "43%", left: "28%", width: "44%", height: "29%", rotate: -1, z: 7 },
-        mobile: { top: "37%", left: "25%", width: "52%", height: "24%", rotate: -1, z: 7 },
+        mobile: { top: "36%", left: "25%", width: "52%", height: "18%", rotate: -1, z: 7 },
       },
     },
   ],
@@ -38,7 +38,7 @@ export const filmNegative = {
     variant: "letter",
     placement: {
       desktop: { bottom: "6%", left: "11%", width: "78%", height: "29%", rotate: 1, z: 8 },
-      mobile: { bottom: "7%", left: "8%", width: "84%", height: "34%", rotate: 1, z: 8 },
+      mobile: { bottom: "5%", left: "8%", width: "84%", height: "30%", rotate: 1, z: 8 },
     },
   },
   decorations: [
@@ -46,7 +46,7 @@ export const filmNegative = {
       kind: "film",
       placement: {
         desktop: { top: "48%", left: "4%", width: "29%", height: "6%", rotate: 7, z: 3 },
-        mobile: { top: "48%", left: "2%", width: "32%", height: "5%", rotate: 7, z: 3 },
+        mobile: { top: "49%", left: "2%", width: "32%", height: "4%", rotate: 7, z: 3 },
       },
     },
     {

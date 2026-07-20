@@ -5,7 +5,7 @@ export const diaryEntry = {
   surface: "paper",
   namePlacement: {
     desktop: { top: "6%", left: "11%", width: "43%", rotate: -2, z: 9 },
-    mobile: { top: "5%", left: "11%", width: "60%", rotate: -2, z: 9 },
+    mobile: { top: "4%", left: "11%", width: "60%", rotate: -2, z: 9 },
   },
   photos: [
     {
@@ -13,7 +13,7 @@ export const diaryEntry = {
       variant: "polaroid",
       placement: {
         desktop: { top: "13%", right: "7%", width: "43%", height: "35%", rotate: 6, z: 6 },
-        mobile: { top: "15%", right: "5%", width: "56%", height: "29%", rotate: 6, z: 6 },
+        mobile: { top: "13%", right: "5%", width: "56%", height: "22%", rotate: 6, z: 6 },
       },
     },
     {
@@ -22,7 +22,7 @@ export const diaryEntry = {
       captionLayer: { position: "top" },
       placement: {
         desktop: { top: "25%", left: "10%", width: "38%", height: "29%", rotate: -6, z: 5 },
-        mobile: { top: "27%", left: "6%", width: "43%", height: "23%", rotate: -6, z: 5 },
+        mobile: { top: "30%", left: "6%", width: "43%", height: "18%", rotate: -6, z: 5 },
       },
     },
   ],
@@ -30,7 +30,7 @@ export const diaryEntry = {
     variant: "diary",
     placement: {
       desktop: { bottom: "6%", left: "10%", width: "78%", height: "44%", rotate: 1, z: 7 },
-      mobile: { bottom: "7%", left: "8%", width: "84%", height: "45%", rotate: 1, z: 7 },
+      mobile: { bottom: "5%", left: "8%", width: "84%", height: "35%", rotate: 1, z: 7 },
     },
   },
   decorations: [
@@ -38,7 +38,7 @@ export const diaryEntry = {
       kind: "tape",
       placement: {
         desktop: { top: "11%", right: "18%", width: "19%", rotate: 3, z: 10 },
-        mobile: { top: "13%", right: "18%", width: "23%", rotate: 3, z: 10 },
+        mobile: { top: "11%", right: "18%", width: "23%", rotate: 3, z: 10 },
       },
     },
     {
@@ -54,7 +54,7 @@ export const diaryEntry = {
       kind: "flower",
       placement: {
         desktop: { bottom: "3%", right: "3%", width: "15%", height: "19%", rotate: -12, z: 8 },
-        mobile: { bottom: "2%", right: "2%", width: "17%", height: "16%", rotate: -12, z: 8 },
+        mobile: { bottom: "2%", right: "2%", width: "17%", height: "12%", rotate: -12, z: 8 },
       },
     },
   ],

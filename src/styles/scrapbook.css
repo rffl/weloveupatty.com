@@ -1090,11 +1090,12 @@
     }
 
     .opening-page {
-      padding: clamp(0.85rem, 4cqh, 1.35rem);
+      padding: clamp(0.75rem, 3cqh, 1.2rem);
     }
 
     .opening-page__copy {
       width: 86%;
+      transform: translateY(-3cqh) rotate(-0.6deg);
     }
 
     .opening-page__copy > p:first-child {
@@ -1112,7 +1113,7 @@
 
     .opening-page__route {
       right: 6%;
-      bottom: 5%;
+      bottom: 4%;
       left: 6%;
       align-items: start;
       font-size: clamp(0.35rem, 1.65cqw, 0.48rem);
@@ -1122,31 +1123,37 @@
       max-width: 7ch;
     }
 
+    .opening-page__tape {
+      top: 6%;
+    }
+
     .opening-page__map {
-      bottom: 15%;
+      bottom: 13%;
       width: 26%;
-      height: 15%;
+      height: 12%;
     }
 
     .opening-page__stamp {
+      top: 7%;
       width: 25%;
-      height: 10%;
+      height: 8%;
     }
 
     .opening-page__doodle {
       right: 4%;
-      bottom: 18%;
+      bottom: 20%;
       width: 28%;
     }
 
     .closing-page {
-      padding: clamp(0.45rem, 2.4cqh, 1rem);
+      padding: clamp(0.45rem, 2cqh, 0.9rem);
     }
 
     .closing-page__letter {
       width: 86%;
       gap: clamp(0.24rem, 1cqh, 0.55rem);
       padding: clamp(0.62rem, 4.4cqw, 1.15rem);
+      transform: translateY(-2cqh) rotate(-1.4deg);
     }
 
     .closing-page h2 {
@@ -1165,6 +1172,22 @@
     .closing-page__postscript {
       max-width: 62%;
       font-size: clamp(0.64rem, 3.2cqw, 0.9rem);
+    }
+
+    .closing-page__tape {
+      top: 5.5%;
+    }
+
+    .closing-page__flower {
+      right: 2%;
+      bottom: 3%;
+      width: 17%;
+      height: 15%;
+    }
+
+    .closing-page__heart {
+      top: 6%;
+      right: 5%;
     }
 
     .scrapbook-controls {

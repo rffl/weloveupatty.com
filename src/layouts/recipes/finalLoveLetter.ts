@@ -5,7 +5,7 @@ export const finalLoveLetter = {
   surface: "light",
   namePlacement: {
     desktop: { top: "6%", left: "8%", width: "46%", rotate: -2, z: 9 },
-    mobile: { top: "5%", left: "7%", width: "63%", rotate: -2, z: 9 },
+    mobile: { top: "4%", left: "7%", width: "63%", rotate: -2, z: 9 },
   },
   photos: [
     {
@@ -13,7 +13,7 @@ export const finalLoveLetter = {
       variant: "polaroid",
       placement: {
         desktop: { top: "13%", left: "6%", width: "45%", height: "36%", rotate: -6, z: 5 },
-        mobile: { top: "15%", left: "5%", width: "58%", height: "30%", rotate: -6, z: 5 },
+        mobile: { top: "13%", left: "5%", width: "58%", height: "23%", rotate: -6, z: 5 },
       },
     },
     {
@@ -22,7 +22,7 @@ export const finalLoveLetter = {
       captionLayer: { position: "top" },
       placement: {
         desktop: { top: "19%", right: "6%", width: "43%", height: "35%", rotate: 6, z: 6 },
-        mobile: { top: "27%", right: "5%", width: "48%", height: "26%", rotate: 6, z: 6 },
+        mobile: { top: "32%", right: "5%", width: "48%", height: "20%", rotate: 6, z: 6 },
       },
     },
   ],
@@ -30,7 +30,7 @@ export const finalLoveLetter = {
     variant: "love-letter",
     placement: {
       desktop: { bottom: "6%", left: "10%", width: "79%", height: "45%", rotate: 1, z: 7 },
-      mobile: { bottom: "7%", left: "8%", width: "84%", height: "45%", rotate: 1, z: 7 },
+      mobile: { bottom: "5%", left: "8%", width: "84%", height: "35%", rotate: 1, z: 7 },
     },
   },
   decorations: [
@@ -38,7 +38,7 @@ export const finalLoveLetter = {
       kind: "tape",
       placement: {
         desktop: { top: "11%", left: "19%", width: "20%", rotate: 0, z: 10 },
-        mobile: { top: "13%", left: "20%", width: "25%", rotate: 0, z: 10 },
+        mobile: { top: "11%", left: "20%", width: "25%", rotate: 0, z: 10 },
       },
     },
     {
@@ -46,7 +46,7 @@ export const finalLoveLetter = {
       labelKey: "finalLoveLetterStamp",
       placement: {
         desktop: { top: "6%", right: "6%", width: "23%", height: "15%", rotate: 8, z: 9 },
-        mobile: { top: "9%", right: "3%", width: "27%", height: "12%", rotate: 8, z: 9 },
+        mobile: { top: "7%", right: "3%", width: "27%", height: "9%", rotate: 8, z: 9 },
       },
     },
     {

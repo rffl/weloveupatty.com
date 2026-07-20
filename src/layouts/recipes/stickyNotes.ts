@@ -5,7 +5,7 @@ export const stickyNotes = {
   surface: "graph",
   namePlacement: {
     desktop: { top: "6%", right: "7%", width: "43%", rotate: 4, z: 9 },
-    mobile: { top: "5%", right: "6%", width: "59%", rotate: 4, z: 9 },
+    mobile: { top: "4%", right: "6%", width: "59%", rotate: 4, z: 9 },
   },
   photos: [
     {
@@ -13,7 +13,7 @@ export const stickyNotes = {
       variant: "snapshot",
       placement: {
         desktop: { top: "13%", left: "6%", width: "49%", height: "37%", rotate: -6, z: 5 },
-        mobile: { top: "15%", left: "5%", width: "61%", height: "30%", rotate: -6, z: 5 },
+        mobile: { top: "13%", left: "5%", width: "61%", height: "23%", rotate: -6, z: 5 },
       },
     },
     {
@@ -22,7 +22,7 @@ export const stickyNotes = {
       captionLayer: { position: "top" },
       placement: {
         desktop: { top: "27%", right: "6%", width: "40%", height: "33%", rotate: 7, z: 6 },
-        mobile: { top: "28%", right: "5%", width: "45%", height: "25%", rotate: 7, z: 6 },
+        mobile: { top: "31%", right: "5%", width: "45%", height: "19%", rotate: 7, z: 6 },
       },
     },
   ],
@@ -30,7 +30,7 @@ export const stickyNotes = {
     variant: "sticky",
     placement: {
       desktop: { bottom: "9%", left: "16%", width: "62%", height: "37%", rotate: -3, z: 7 },
-      mobile: { bottom: "9%", left: "10%", width: "79%", height: "40%", rotate: -3, z: 7 },
+      mobile: { bottom: "6%", left: "10%", width: "79%", height: "32%", rotate: -3, z: 7 },
     },
   },
   decorations: [
@@ -38,14 +38,14 @@ export const stickyNotes = {
       kind: "tape",
       placement: {
         desktop: { top: "11%", left: "20%", width: "20%", rotate: -1, z: 10 },
-        mobile: { top: "13%", left: "21%", width: "25%", rotate: -1, z: 10 },
+        mobile: { top: "11%", left: "21%", width: "25%", rotate: -1, z: 10 },
       },
     },
     {
       kind: "heart",
       placement: {
         desktop: { bottom: "4%", right: "7%", width: "11%", rotate: 8, z: 9 },
-        mobile: { bottom: "3%", right: "5%", width: "13%", rotate: 8, z: 9 },
+        mobile: { bottom: "2.5%", right: "5%", width: "13%", rotate: 8, z: 9 },
       },
     },
     {
@@ -54,7 +54,7 @@ export const stickyNotes = {
       treatment: "memory-callout",
       placement: {
         desktop: { top: "43%", left: "5%", width: "31%", rotate: -8, z: 8 },
-        mobile: { top: "43%", left: "2%", width: "52%", rotate: -8, z: 8 },
+        mobile: { top: "52%", left: "2%", width: "52%", rotate: -8, z: 8 },
       },
     },
   ],
