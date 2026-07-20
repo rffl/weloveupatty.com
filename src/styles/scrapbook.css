@@ -21,10 +21,12 @@
     display: grid;
     width: 100%;
     height: 100dvh;
-    min-height: 100dvh;
+    min-height: 0;
     place-items: center;
     overflow: hidden;
+    overscroll-behavior: none;
     padding: 1rem;
+    touch-action: manipulation;
   }
 
   .scrapbook-experience:focus {
@@ -106,8 +108,13 @@
 
   .page-turner {
     position: relative;
-    touch-action: pan-y;
+    touch-action: pan-y pinch-zoom;
     user-select: none;
+  }
+
+  .openable-note,
+  .scrapbook-control {
+    touch-action: manipulation;
   }
 
   .page-turner__content {
@@ -969,18 +976,47 @@
 
   @media (width < 900px) {
     .scrapbook-experience {
-      padding: 0.7rem;
+      --scrapbook-safe-top: max(
+        0.4rem,
+        env(safe-area-inset-top, 0px)
+      );
+      --scrapbook-safe-right: max(
+        0.45rem,
+        env(safe-area-inset-right, 0px)
+      );
+      --scrapbook-safe-bottom: max(
+        0.4rem,
+        env(safe-area-inset-bottom, 0px)
+      );
+      --scrapbook-safe-left: max(
+        0.45rem,
+        env(safe-area-inset-left, 0px)
+      );
+
+      padding: var(--scrapbook-safe-top) var(--scrapbook-safe-right)
+        var(--scrapbook-safe-bottom) var(--scrapbook-safe-left);
     }
 
     .scrapbook-stage {
       --controls-track: 2.9rem;
+      --mobile-page-ratio: 0.54;
 
-      width: min(92vw, calc((100dvh - 6rem) * 0.72), 27rem);
+      width: min(
+        94vw,
+        100%,
+        calc(
+          (
+              100dvh - 4.75rem - var(--scrapbook-safe-top) -
+                var(--scrapbook-safe-bottom)
+            ) * var(--mobile-page-ratio)
+        ),
+        27rem
+      );
       gap: clamp(0.38rem, 1vh, 0.62rem);
     }
 
     .scrapbook-book {
-      aspect-ratio: 0.72 / 1;
+      aspect-ratio: var(--mobile-page-ratio) / 1;
       padding: 2.2%;
       border-radius: 0.42rem 0.65rem 0.65rem 0.42rem;
     }
@@ -1168,7 +1204,17 @@
 
   @media (width < 900px) and (height < 520px) {
     .scrapbook-stage {
-      width: min(92vw, calc((100dvh - 5.6rem) * 0.72), 27rem);
+      width: min(
+        92vw,
+        100%,
+        calc(
+          (
+              100dvh - 4.5rem - var(--scrapbook-safe-top) -
+                var(--scrapbook-safe-bottom)
+            ) * var(--mobile-page-ratio)
+        ),
+        27rem
+      );
     }
 
     .scrapbook-cover__label {
