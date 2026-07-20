@@ -47,50 +47,6 @@
     transform: translateX(-100%) scale(0.996) !important;
   }
 
-  .page-turner__turning-leaf {
-    transform-origin: center !important;
-    transform-style: flat !important;
-    animation-name: reduced-page-departure !important;
-    animation-duration: 140ms !important;
-    animation-timing-function: ease-out !important;
-  }
-
-  .page-turner[data-turn="backward"] .page-turner__turning-leaf {
-    animation-name: reduced-page-departure !important;
-  }
-
-  .scrapbook-experience[data-mode="desktop"]
-    .page-turner__stationary-outgoing {
-    animation-name: reduced-stationary-departure !important;
-    animation-duration: 140ms !important;
-    animation-timing-function: ease-out !important;
-  }
-
-  @keyframes reduced-page-departure {
-    from {
-      opacity: 1;
-      box-shadow: 0 8px 16px rgb(42 23 13 / 20%);
-      transform: translateY(-1px) scale(1.002);
-    }
-
-    to {
-      opacity: 0;
-      box-shadow: 0 1px 3px rgb(42 23 13 / 8%);
-      transform: translateY(1px) scale(0.996);
-    }
-  }
-
-  @keyframes reduced-stationary-departure {
-    from {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    to {
-      visibility: hidden;
-      opacity: 0;
-    }
-  }
 }
 
 @layer components {
