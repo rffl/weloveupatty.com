@@ -455,7 +455,7 @@ export function PageTurner({
     >
       {showParkedLeaf ? (
         <>
-          <div aria-hidden="true" className="page-turner__parked-leaf">
+          <div aria-hidden="true" className="page-turner__parked-leaf" inert>
             <div
               className="page-turner__leaf-face page-turner__leaf-face--back"
               data-paper-back
