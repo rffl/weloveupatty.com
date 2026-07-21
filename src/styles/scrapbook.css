@@ -1257,6 +1257,10 @@
     }
 
     .scrapbook-experience[data-mode="mobile"] .scrapbook-page-region {
+      position: absolute;
+      inset: 2.2%;
+      width: auto;
+      height: auto;
       overflow: visible;
     }
 
