@@ -134,6 +134,7 @@ export function usePageTurner({
         startProgress: 0,
         velocityPxPerMs: 0,
         reducedMotion,
+        mode: turn.mode,
       });
       turnProgressRef.current = 0;
       publishTurnState({
@@ -284,6 +285,7 @@ export function usePageTurner({
         startProgress,
         velocityPxPerMs: release.velocityTowardDirectionPxPerMs,
         reducedMotion,
+        mode: current.turn.mode,
       });
       turnProgressRef.current = startProgress;
       publishTurnState({

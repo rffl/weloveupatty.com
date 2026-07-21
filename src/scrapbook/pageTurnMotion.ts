@@ -49,7 +49,8 @@ export const directionLockDistance = 8;
 export const clickSuppressionDistance = 8;
 export const fullTurnDistanceRatio = 0.72;
 export const minimumFullTurnDistance = 120;
-export const automaticTurnDurationMs = 450;
+export const desktopAutomaticTurnDurationMs = 560;
+export const mobileAutomaticTurnDurationMs = 480;
 export const reducedTurnDurationMs = 140;
 export const turnEasing = "cubic-bezier(0.22, 0.7, 0.2, 1)";
 const maximumTurnAngleDegrees = 178;
@@ -140,13 +141,16 @@ export function settleDurationMs(input: {
   startProgress: number;
   velocityPxPerMs: number;
   reducedMotion: boolean;
+  mode: ResponsiveMode;
 }): number {
   if (input.reducedMotion) {
     return input.settleTarget === "destination" ? reducedTurnDurationMs : 1;
   }
 
   if (input.source === "automatic") {
-    return automaticTurnDurationMs;
+    return input.mode === "desktop"
+      ? desktopAutomaticTurnDurationMs
+      : mobileAutomaticTurnDurationMs;
   }
 
   const progress = clampProgress(input.startProgress);

@@ -512,56 +512,53 @@ export function PageTurner({
         {children}
       </div>
 
-      {mode === "desktop" || activeTurn ? (
+      {mode === "desktop" ? (
+        <span aria-hidden="true" className="page-turner__scene-spine" />
+      ) : null}
+
+      {activeTurn ? (
         <div aria-hidden="true" className="page-turner__scene" inert>
+          <div className="page-turner__destination" ref={destinationRef}>
+            {destinationContent}
+          </div>
+
           {mode === "desktop" ? (
-            <span className="page-turner__scene-spine" />
-          ) : null}
-          {activeTurn ? (
-            <>
-              <div className="page-turner__destination" ref={destinationRef}>
-                {destinationContent}
+            <div className="page-turner__stationary-source">
+              <div className="page-turner__visual-composition">
+                {sourceContent}
               </div>
-
-              {mode === "desktop" ? (
-                <div className="page-turner__stationary-source">
-                  <div className="page-turner__visual-composition">
-                    {sourceContent}
-                  </div>
-                </div>
-              ) : null}
-
-              <span
-                className="page-turner__cast-shadow"
-                ref={castShadowRef}
-              />
-              <span
-                className="page-turner__gutter-shade"
-                ref={gutterShadeRef}
-              />
-
-              <div className="page-turner__turning-leaf" ref={leafRef}>
-                <div className="page-turner__leaf-face page-turner__leaf-face--front">
-                  <div className="page-turner__visual-composition">
-                    {leafFrontContent}
-                  </div>
-                </div>
-                <div
-                  className="page-turner__leaf-face page-turner__leaf-face--back"
-                  data-paper-back={mode === "mobile" || undefined}
-                >
-                  <div className="page-turner__visual-composition">
-                    {leafBackContent}
-                  </div>
-                </div>
-                <span
-                  className="page-turner__leaf-shading"
-                  ref={shadingRef}
-                />
-                <span className="page-turner__leaf-edge" ref={edgeRef} />
-              </div>
-            </>
+            </div>
           ) : null}
+
+          <span
+            className="page-turner__cast-shadow"
+            ref={castShadowRef}
+          />
+          <span
+            className="page-turner__gutter-shade"
+            ref={gutterShadeRef}
+          />
+
+          <div className="page-turner__turning-leaf" ref={leafRef}>
+            <div className="page-turner__leaf-face page-turner__leaf-face--front">
+              <div className="page-turner__visual-composition">
+                {leafFrontContent}
+              </div>
+            </div>
+            <div
+              className="page-turner__leaf-face page-turner__leaf-face--back"
+              data-paper-back={mode === "mobile" || undefined}
+            >
+              <div className="page-turner__visual-composition">
+                {leafBackContent}
+              </div>
+            </div>
+            <span
+              className="page-turner__leaf-shading"
+              ref={shadingRef}
+            />
+            <span className="page-turner__leaf-edge" ref={edgeRef} />
+          </div>
         </div>
       ) : null}
     </div>
