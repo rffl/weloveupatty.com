@@ -49,6 +49,10 @@ export function Scrapbook({ content }: ScrapbookProps) {
   });
   const visualTurn =
     turner.turnState.phase === "idle" ? null : turner.turnState.turn;
+  const renderedPageIndex =
+    mode === "mobile" && visualTurn?.direction === "forward"
+      ? visualTurn.destinationPageIndex
+      : turner.activePageIndex;
   const spinePageIndex =
     turner.turnState.phase === "idle"
       ? turner.activePageIndex
@@ -356,7 +360,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
               turnState={turner.turnState}
             >
               <SpreadRenderer
-                activePageIndex={turner.activePageIndex}
+                activePageIndex={renderedPageIndex}
                 decorationLabels={content.recipeDecorationLabels}
                 desktopSpreads={desktopSpreads}
                 engagementEnabled={contentOpen && !turner.isBusy}

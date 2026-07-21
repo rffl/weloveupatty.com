@@ -607,9 +607,11 @@ export function PageTurner({
 
       {activeTurn ? (
         <div aria-hidden="true" className="page-turner__scene" inert>
-          <div className="page-turner__destination" ref={destinationRef}>
-            {destinationContent}
-          </div>
+          {mode === "desktop" ? (
+            <div className="page-turner__destination" ref={destinationRef}>
+              {destinationContent}
+            </div>
+          ) : null}
 
           {mode === "desktop" ? (
             <div className="page-turner__stationary-source">
