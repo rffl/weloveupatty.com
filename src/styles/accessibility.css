@@ -47,6 +47,22 @@
     transform: translateX(-100%) scale(0.996) !important;
   }
 
+  .page-turner[data-reduced-motion] {
+    perspective: none;
+  }
+
+  .page-turner[data-reduced-motion] .page-turner__turning-leaf,
+  .page-turner[data-reduced-motion] .page-turner__stationary-source,
+  .page-turner[data-reduced-motion] .page-turner__cast-shadow {
+    visibility: hidden;
+  }
+
+  .page-turner[data-reduced-motion] .page-turner__destination {
+    visibility: visible;
+    opacity: 0;
+    transform: translateY(1px) scale(0.996);
+    will-change: opacity, transform;
+  }
 }
 
 @layer components {
