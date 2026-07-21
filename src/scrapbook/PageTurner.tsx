@@ -3,6 +3,7 @@ import type { MouseEventHandler, ReactNode } from "react";
 
 import type { ResponsiveMode } from "../layouts/types";
 import {
+  clampProgress,
   mobileForwardTurnEasing,
   turnAngleDegrees,
   turnDepth,
@@ -23,6 +24,23 @@ export type ParkedPageLayer = Readonly<{
 }>;
 
 const stagedLeafRevealStart = 0.84;
+const dragTimelineDurationMs = 1000;
+const dragTimelineProgressStops = [
+  0,
+  0.125,
+  0.25,
+  0.375,
+  0.5,
+  0.625,
+  0.75,
+  0.875,
+  1,
+] as const;
+
+type DragTimeline = Readonly<{
+  direction: TurnDirection;
+  animations: readonly Animation[];
+}>;
 
 function stagedLeafOpacity(progress: number): number {
   return Math.max(
@@ -84,6 +102,7 @@ export function PageTurner({
   const gutterShadeRef = useRef<HTMLSpanElement>(null);
   const destinationRef = useRef<HTMLDivElement>(null);
   const stagedParkedLeafRef = useRef<HTMLDivElement>(null);
+  const dragTimelineRef = useRef<DragTimeline | null>(null);
   const visualProgress = useRef(0);
   const gestureDirection = useRef<TurnDirection | null>(null);
   const visualFrame = useRef<number | null>(null);
@@ -99,6 +118,18 @@ export function PageTurner({
       visualProgress.current = progress;
 
       if (reducedMotion) {
+        return;
+      }
+
+      const dragTimeline = dragTimelineRef.current;
+
+      if (dragTimeline?.direction === direction) {
+        const currentTime =
+          clampProgress(progress) * dragTimelineDurationMs;
+
+        dragTimeline.animations.forEach((animation) => {
+          animation.currentTime = currentTime;
+        });
         return;
       }
 
@@ -472,6 +503,96 @@ export function PageTurner({
       runningAnimations.current = [];
     };
   }, [applyProgress, mode, onTurnComplete, reducedMotion, turnState]);
+
+  useLayoutEffect(() => {
+    if (
+      mode !== "mobile" ||
+      reducedMotion ||
+      turnState.phase !== "dragging"
+    ) {
+      return;
+    }
+
+    const { turn } = turnState;
+    const leaf = leafRef.current;
+    const edge = edgeRef.current;
+    const gutterShade = gutterShadeRef.current;
+    const stagedParkedLeaf = stagedParkedLeafRef.current;
+
+    if (!leaf || !edge || !gutterShade) {
+      return;
+    }
+
+    const options: KeyframeAnimationOptions = {
+      duration: dragTimelineDurationMs,
+      easing: "linear",
+      fill: "both",
+    };
+    const animations: Animation[] = [
+      leaf.animate(
+        dragTimelineProgressStops.map((progress) => ({
+          offset: progress,
+          transform: `rotateY(${turnAngleDegrees({
+            mode,
+            direction: turn.direction,
+            progress,
+          })}deg)`,
+        })),
+        options,
+      ),
+      edge.animate(
+        dragTimelineProgressStops.map((progress) => ({
+          offset: progress,
+          opacity: turnDepth(progress) * 0.82,
+        })),
+        options,
+      ),
+      gutterShade.animate(
+        dragTimelineProgressStops.map((progress) => ({
+          offset: progress,
+          opacity: turnDepth(progress) * 0.42,
+          transform: `scaleX(${0.35 + turnDepth(progress) * 0.65})`,
+        })),
+        options,
+      ),
+    ];
+
+    if (stagedParkedLeaf) {
+      animations.push(
+        stagedParkedLeaf.animate(
+          [
+            { offset: 0, opacity: 0 },
+            { offset: stagedLeafRevealStart, opacity: 0 },
+            { offset: 1, opacity: 1 },
+          ],
+          options,
+        ),
+      );
+    }
+
+    const currentTime =
+      clampProgress(visualProgress.current) * dragTimelineDurationMs;
+
+    animations.forEach((animation) => {
+      animation.pause();
+      animation.currentTime = currentTime;
+    });
+    dragTimelineRef.current = {
+      direction: turn.direction,
+      animations,
+    };
+    runningAnimations.current = animations;
+
+    return () => {
+      if (dragTimelineRef.current?.animations === animations) {
+        dragTimelineRef.current = null;
+      }
+      animations.forEach((animation) => animation.cancel());
+      if (runningAnimations.current === animations) {
+        runningAnimations.current = [];
+      }
+    };
+  }, [mode, reducedMotion, turnState]);
 
   useLayoutEffect(() => {
     if (turnState.phase === "dragging") {
