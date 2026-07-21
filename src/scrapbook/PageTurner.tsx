@@ -512,10 +512,6 @@ export function PageTurner({
         {children}
       </div>
 
-      {mode === "desktop" ? (
-        <span aria-hidden="true" className="page-turner__scene-spine" />
-      ) : null}
-
       {activeTurn ? (
         <div aria-hidden="true" className="page-turner__scene" inert>
           <div className="page-turner__destination" ref={destinationRef}>

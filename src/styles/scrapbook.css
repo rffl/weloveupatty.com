@@ -96,6 +96,25 @@
     display: none;
   }
 
+  .scrapbook-experience[data-mode="desktop"]
+    .scrapbook-book[data-page-spine]::after {
+    display: block;
+    width: clamp(0.58rem, 1.15cqw, 1rem);
+    isolation: isolate;
+    background:
+      linear-gradient(
+        90deg,
+        rgb(39 21 14 / 24%),
+        rgb(255 245 225 / 20%) 48%,
+        rgb(39 21 14 / 29%)
+      ),
+      #ddceb5;
+    box-shadow:
+      inset 0.22rem 0 0.34rem rgb(45 24 15 / 19%),
+      inset -0.22rem 0 0.34rem rgb(45 24 15 / 21%);
+    backface-visibility: hidden;
+  }
+
   .scrapbook-page-region {
     position: relative;
     z-index: 10;
@@ -153,7 +172,6 @@
   .page-turner__parked-stack,
   .page-turner__parked-leaf,
   .page-turner__leaf-face,
-  .page-turner__scene-spine,
   .page-turner__cast-shadow,
   .page-turner__gutter-shade {
     position: absolute;
@@ -178,29 +196,6 @@
 
   .page-turner__stationary-source {
     display: none;
-  }
-
-  .page-turner__scene-spine {
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    z-index: 41;
-    width: clamp(0.7rem, 1.8cqw, 1.45rem);
-    pointer-events: none;
-    isolation: isolate;
-    background:
-      linear-gradient(
-        90deg,
-        rgb(39 21 14 / 28%),
-        rgb(255 245 225 / 16%) 48%,
-        rgb(39 21 14 / 34%)
-      ),
-      #c9b99f;
-    box-shadow:
-      inset 0.28rem 0 0.42rem rgb(45 24 15 / 22%),
-      inset -0.28rem 0 0.42rem rgb(45 24 15 / 24%);
-    backface-visibility: hidden;
-    transform: translateX(-50%);
   }
 
   .page-turner__turning-leaf {
