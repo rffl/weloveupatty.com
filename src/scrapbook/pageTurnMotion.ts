@@ -49,9 +49,12 @@ export const directionLockDistance = 8;
 export const clickSuppressionDistance = 8;
 export const fullTurnDistanceRatio = 0.72;
 export const minimumFullTurnDistance = 120;
-export const automaticTurnDurationMs = 370;
+export const automaticTurnDurationMs = 450;
 export const reducedTurnDurationMs = 140;
 export const turnEasing = "cubic-bezier(0.22, 0.7, 0.2, 1)";
+const maximumTurnAngleDegrees = 178;
+const maximumTurnAngleRadians =
+  (maximumTurnAngleDegrees * Math.PI) / 180;
 
 export function clampProgress(value: number): number {
   return Math.max(0, Math.min(1, value));
@@ -79,7 +82,9 @@ export function progressForProjectedEdge(
   const width = Math.max(1, pageWidthPx);
   const projectedEdge = Math.max(-1, Math.min(1, 1 - distance / width));
 
-  return clampProgress(Math.acos(projectedEdge) / Math.PI);
+  return clampProgress(
+    Math.acos(projectedEdge) / maximumTurnAngleRadians,
+  );
 }
 
 export function shouldCommitSwipe(input: {
@@ -163,7 +168,7 @@ export function settleDurationMs(input: {
 }
 
 export function fallbackDelayMs(durationMs: number): number {
-  return Math.min(durationMs + 120, 500);
+  return durationMs + 120;
 }
 
 export function turnAngleDegrees(input: {
@@ -175,11 +180,13 @@ export function turnAngleDegrees(input: {
 
   if (input.mode === "mobile") {
     return input.direction === "forward"
-      ? -178 * progress
-      : -178 * (1 - progress);
+      ? -maximumTurnAngleDegrees * progress
+      : -maximumTurnAngleDegrees * (1 - progress);
   }
 
-  return input.direction === "forward" ? -178 * progress : 178 * progress;
+  return input.direction === "forward"
+    ? -maximumTurnAngleDegrees * progress
+    : maximumTurnAngleDegrees * progress;
 }
 
 export function turnDepth(progress: number): number {
