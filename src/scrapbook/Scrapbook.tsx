@@ -14,6 +14,7 @@ import { Decoration } from "../components/Decoration";
 import { ScrapbookControls } from "../components/ScrapbookControls";
 import type { ScrapbookContent } from "../content/types";
 import { PageTurner } from "./PageTurner";
+import type { ParkedPageLayer } from "./PageTurner";
 import { buildDesktopSpreads, buildPages } from "./pageModel";
 import { SpreadRenderer } from "./SpreadRenderer";
 import { useAdjacentImagePreload } from "./useAdjacentImagePreload";
@@ -157,18 +158,47 @@ export function Scrapbook({ content }: ScrapbookProps) {
       pages={pages}
     />
   ) : null;
-  const parkedPreviousContent =
-    mode === "mobile" && turner.activePageIndex > 0 ? (
-      <SpreadRenderer
-        activePageIndex={turner.activePageIndex - 1}
-        decorationLabels={content.recipeDecorationLabels}
-        desktopSpreads={desktopSpreads}
-        engagementEnabled={false}
-        mode={mode}
-        onRememberPage={turner.rememberPage}
-        pages={pages}
-      />
-    ) : null;
+  const parkedStackTopPageIndex =
+    mode !== "mobile"
+      ? -1
+      : visualTurn
+        ? Math.min(
+            visualTurn.sourcePageIndex,
+            visualTurn.destinationPageIndex,
+          ) - 1
+        : turner.activePageIndex - 1;
+  const parkedStackStartPageIndex = Math.max(
+    0,
+    parkedStackTopPageIndex - 1,
+  );
+  const parkedPageStack: ParkedPageLayer[] =
+    parkedStackTopPageIndex < 0
+      ? []
+      : Array.from(
+          {
+            length:
+              parkedStackTopPageIndex - parkedStackStartPageIndex + 1,
+          },
+          (_, offset) => {
+            const pageIndex = parkedStackStartPageIndex + offset;
+
+            return {
+              pageIndex,
+              content: (
+                <SpreadRenderer
+                  activePageIndex={pageIndex}
+                  decorationLabels={content.recipeDecorationLabels}
+                  desktopSpreads={desktopSpreads}
+                  engagementEnabled={false}
+                  mode={mode}
+                  onRememberPage={turner.rememberPage}
+                  pages={pages}
+                />
+              ),
+            };
+          },
+        );
+  const parkedHistoryCount = Math.max(0, parkedStackTopPageIndex + 1);
 
   useLayoutEffect(() => {
     if (coverPhase === "open" && focusContentAfterOpening.current) {
@@ -279,6 +309,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
           aria-label={content.title}
           className="scrapbook-book"
           data-cover-phase={coverPhase}
+          data-page-turning={visualTurn !== null || undefined}
           role="group"
         >
           <div
@@ -307,7 +338,8 @@ export function Scrapbook({ content }: ScrapbookProps) {
               onNext={requestNext}
               onPrevious={requestPrevious}
               onTurnComplete={turner.completeSettle}
-              parkedPreviousContent={parkedPreviousContent}
+              parkedHistoryCount={parkedHistoryCount}
+              parkedPageStack={parkedPageStack}
               reducedMotion={reducedMotion}
               sourceContent={sourceContent}
               turnState={turner.turnState}

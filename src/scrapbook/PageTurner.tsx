@@ -15,11 +15,17 @@ import type {
 } from "./pageTurnMotion";
 import { isInteractiveTarget, useSwipeGesture } from "./useSwipeGesture";
 
+export type ParkedPageLayer = Readonly<{
+  pageIndex: number;
+  content: ReactNode;
+}>;
+
 type PageTurnerProps = {
   children: ReactNode;
   sourceContent: ReactNode | null;
   destinationContent: ReactNode | null;
-  parkedPreviousContent: ReactNode | null;
+  parkedPageStack: readonly ParkedPageLayer[];
+  parkedHistoryCount: number;
   mode: ResponsiveMode;
   reducedMotion: boolean;
   enabled: boolean;
@@ -41,7 +47,8 @@ export function PageTurner({
   children,
   sourceContent,
   destinationContent,
-  parkedPreviousContent,
+  parkedPageStack,
+  parkedHistoryCount,
   mode,
   reducedMotion,
   enabled,
@@ -428,8 +435,9 @@ export function PageTurner({
   };
 
   const activeTurn = turnState.phase === "idle" ? null : turnState.turn;
-  const showParkedLeaf =
-    mode === "mobile" && activeTurn === null && parkedPreviousContent !== null;
+  const showParkedStack =
+    mode === "mobile" && parkedPageStack.length > 0;
+  const showParkedGrabZone = showParkedStack && activeTurn === null;
   const direction = activeTurn?.direction;
   const mobileBackward = mode === "mobile" && direction === "backward";
   const leafFrontContent = mobileBackward
@@ -453,19 +461,46 @@ export function PageTurner({
       ref={surfaceRef}
       {...gestureProps}
     >
-      {showParkedLeaf ? (
+      {showParkedStack ? (
         <>
-          <div aria-hidden="true" className="page-turner__parked-leaf" inert>
-            <div
-              className="page-turner__leaf-face page-turner__leaf-face--back"
-              data-paper-back
-            >
-              <div className="page-turner__visual-composition">
-                {parkedPreviousContent}
-              </div>
-            </div>
+          <div
+            aria-hidden="true"
+            className="page-turner__parked-stack"
+            data-has-deeper-history={
+              parkedHistoryCount > parkedPageStack.length || undefined
+            }
+            inert
+          >
+            {parkedHistoryCount > parkedPageStack.length ? (
+              <span className="page-turner__parked-depth" />
+            ) : null}
+            {parkedPageStack.map((page, index) => {
+              const depth = parkedPageStack.length - index - 1;
+
+              return (
+                <div
+                  className="page-turner__parked-leaf"
+                  data-stack-depth={depth}
+                  key={page.pageIndex}
+                >
+                  <div
+                    className="page-turner__leaf-face page-turner__leaf-face--back"
+                    data-paper-back
+                  >
+                    <div className="page-turner__visual-composition">
+                      {page.content}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <span aria-hidden="true" className="page-turner__parked-grab-zone" />
+          {showParkedGrabZone ? (
+            <span
+              aria-hidden="true"
+              className="page-turner__parked-grab-zone"
+            />
+          ) : null}
         </>
       ) : null}
 
@@ -484,11 +519,14 @@ export function PageTurner({
           </div>
 
           {mode === "desktop" ? (
-            <div className="page-turner__stationary-source">
-              <div className="page-turner__visual-composition">
-                {sourceContent}
+            <>
+              <div className="page-turner__stationary-source">
+                <div className="page-turner__visual-composition">
+                  {sourceContent}
+                </div>
               </div>
-            </div>
+              <span className="page-turner__scene-spine" />
+            </>
           ) : null}
 
           <span
