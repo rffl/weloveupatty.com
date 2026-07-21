@@ -49,6 +49,13 @@ export function Scrapbook({ content }: ScrapbookProps) {
   });
   const visualTurn =
     turner.turnState.phase === "idle" ? null : turner.turnState.turn;
+  const spinePageIndex =
+    turner.turnState.phase === "idle"
+      ? turner.activePageIndex
+      : turner.turnState.phase === "settling" &&
+          turner.turnState.settleTarget === "source"
+        ? turner.turnState.turn.sourcePageIndex
+        : turner.turnState.turn.destinationPageIndex;
   const [coverPhase, setCoverPhase] = useState<CoverPhase>("closed");
   const coverPhaseRef = useRef<CoverPhase>("closed");
   const experienceRef = useRef<HTMLElement>(null);
@@ -310,9 +317,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
           className="scrapbook-book"
           data-cover-phase={coverPhase}
           data-page-spine={
-            mode === "desktop" && turner.activePageIndex > 0
-              ? true
-              : undefined
+            mode === "desktop" && spinePageIndex > 0 ? true : undefined
           }
           role="group"
         >
