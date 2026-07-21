@@ -280,6 +280,13 @@ export function PageTurner({
 
     const complete = () => {
       if (!completed) {
+        if (
+          mode === "mobile" &&
+          turn.direction === "forward" &&
+          settleTarget === "destination"
+        ) {
+          stagedParkedLeafRef.current?.style.setProperty("opacity", "1");
+        }
         completed = true;
         onTurnComplete(turn.id);
       }
@@ -567,6 +574,7 @@ export function PageTurner({
                   data-staged={page.staged || undefined}
                   key={page.pageIndex}
                   ref={page.staged ? stagedParkedLeafRef : undefined}
+                  style={{ opacity: page.staged ? 0 : 1 }}
                 >
                   <div
                     className="page-turner__leaf-face page-turner__leaf-face--back"
