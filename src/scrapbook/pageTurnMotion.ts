@@ -23,6 +23,7 @@ export type PageTurnState =
   | Readonly<{
       phase: "settling";
       turn: TurnSnapshot;
+      inputSource: TurnInputSource;
       settleTarget: TurnSettleTarget;
       startProgress: number;
       durationMs: number;

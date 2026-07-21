@@ -140,6 +140,7 @@ export function usePageTurner({
       publishTurnState({
         phase: "settling",
         turn,
+        inputSource: "automatic",
         settleTarget: "destination",
         startProgress: 0,
         durationMs,
@@ -291,6 +292,7 @@ export function usePageTurner({
       publishTurnState({
         phase: "settling",
         turn: current.turn,
+        inputSource: source,
         settleTarget: resolvedTarget,
         startProgress,
         durationMs,
