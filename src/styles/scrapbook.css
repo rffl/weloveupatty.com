@@ -180,7 +180,7 @@
     top: 0;
     bottom: 0;
     left: 50%;
-    z-index: 39;
+    z-index: 41;
     width: clamp(0.7rem, 1.8cqw, 1.45rem);
     pointer-events: none;
     background: linear-gradient(
@@ -445,7 +445,6 @@
     .page-turner__turning-leaf {
     right: 50%;
     left: 0;
-    z-index: 38;
     transform-origin: right center;
   }
 

@@ -15,26 +15,6 @@ import type {
 } from "./pageTurnMotion";
 import { isInteractiveTarget, useSwipeGesture } from "./useSwipeGesture";
 
-const desktopBackwardLiftProgress = 0.1;
-const desktopForwardTuckProgress = 0.9;
-
-function turningLeafZIndex(input: {
-  mode: ResponsiveMode;
-  direction: TurnDirection;
-  progress: number;
-}): number {
-  if (input.mode !== "desktop") {
-    return 40;
-  }
-
-  const tuckedUnderBinding =
-    input.direction === "forward"
-      ? input.progress >= desktopForwardTuckProgress
-      : input.progress <= desktopBackwardLiftProgress;
-
-  return tuckedUnderBinding ? 38 : 40;
-}
-
 export type ParkedPageLayer = Readonly<{
   pageIndex: number;
   content: ReactNode;
@@ -120,11 +100,6 @@ export function PageTurner({
 
       if (leaf) {
         leaf.style.transform = `rotateY(${angle}deg)`;
-        leaf.style.zIndex = `${turningLeafZIndex({
-          mode,
-          direction,
-          progress,
-        })}`;
       }
       if (castShadow) {
         castShadow.style.opacity = `${depth * 0.48}`;
@@ -339,31 +314,15 @@ export function PageTurner({
       return;
     }
 
-    const transitionProgress =
-      mode !== "desktop"
-        ? []
-        : turn.direction === "forward"
-          ? [
-              desktopForwardTuckProgress - 0.001,
-              desktopForwardTuckProgress + 0.001,
-            ]
-          : [
-              desktopBackwardLiftProgress - 0.001,
-              desktopBackwardLiftProgress + 0.001,
-            ];
-    const candidates = [0.5, ...transitionProgress].filter(
-      (progress) =>
-        progress > Math.min(startProgress, destinationProgress) &&
-        progress < Math.max(startProgress, destinationProgress),
-    );
-    candidates.sort((a, b) =>
-      destinationProgress > startProgress ? a - b : b - a,
-    );
-    const progressStops = [
-      startProgress,
-      ...candidates,
-      destinationProgress,
-    ];
+    const progressStops = [startProgress];
+    const crossesMidpoint =
+      (startProgress < 0.5 && destinationProgress > 0.5) ||
+      (startProgress > 0.5 && destinationProgress < 0.5);
+
+    if (crossesMidpoint) {
+      progressStops.push(0.5);
+    }
+    progressStops.push(destinationProgress);
 
     const offsetFor = (progress: number) => {
       const distance = Math.abs(destinationProgress - startProgress);
@@ -378,11 +337,6 @@ export function PageTurner({
         direction: turn.direction,
         progress,
       })}deg)`,
-      zIndex: `${turningLeafZIndex({
-        mode,
-        direction: turn.direction,
-        progress,
-      })}`,
     }));
     const depthFrames = progressStops.map((progress) => ({
       offset: offsetFor(progress),
