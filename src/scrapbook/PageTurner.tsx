@@ -314,6 +314,12 @@ export function PageTurner({
       return;
     }
 
+    const needsPaintWarmup =
+      mode === "mobile" &&
+      turn.direction === "forward" &&
+      turnState.inputSource === "automatic" &&
+      settleTarget === "destination" &&
+      startProgress === 0;
     const progressStops = [startProgress];
     const crossesMidpoint =
       (startProgress < 0.5 && destinationProgress > 0.5) ||
@@ -358,26 +364,60 @@ export function PageTurner({
       opacity: turnDepth(progress) * 0.42,
       transform: `scaleX(${0.35 + turnDepth(progress) * 0.65})`,
     }));
-    const options: KeyframeAnimationOptions = {
-      duration: durationMs,
-      easing: turnEasing,
-      fill: "forwards",
+    let disposed = false;
+    let firstPaintFrame: number | null = null;
+    let secondPaintFrame: number | null = null;
+
+    const startAnimations = () => {
+      if (disposed) {
+        return;
+      }
+
+      const options: KeyframeAnimationOptions = {
+        duration: durationMs,
+        easing: turnEasing,
+        fill: needsPaintWarmup ? "both" : "forwards",
+      };
+      const leafAnimation = leaf.animate(leafFrames, options);
+      const shadowAnimation = castShadow.animate(depthFrames, options);
+      const edgeAnimation = edge.animate(edgeFrames, options);
+      const shadingAnimation = shading.animate(shadingFrames, options);
+      const gutterAnimation = gutterShade.animate(gutterFrames, options);
+      runningAnimations.current = [
+        leafAnimation,
+        shadowAnimation,
+        edgeAnimation,
+        shadingAnimation,
+        gutterAnimation,
+      ];
+      leafAnimation.finished.then(complete).catch(() => undefined);
     };
-    const leafAnimation = leaf.animate(leafFrames, options);
-    const shadowAnimation = castShadow.animate(depthFrames, options);
-    const edgeAnimation = edge.animate(edgeFrames, options);
-    const shadingAnimation = shading.animate(shadingFrames, options);
-    const gutterAnimation = gutterShade.animate(gutterFrames, options);
-    runningAnimations.current = [
-      leafAnimation,
-      shadowAnimation,
-      edgeAnimation,
-      shadingAnimation,
-      gutterAnimation,
-    ];
-    leafAnimation.finished.then(complete).catch(() => undefined);
+
+    if (needsPaintWarmup) {
+      applyProgress(startProgress, turn.direction);
+      firstPaintFrame = window.requestAnimationFrame(() => {
+        firstPaintFrame = null;
+        if (disposed) {
+          return;
+        }
+
+        secondPaintFrame = window.requestAnimationFrame(() => {
+          secondPaintFrame = null;
+          startAnimations();
+        });
+      });
+    } else {
+      startAnimations();
+    }
 
     return () => {
+      disposed = true;
+      if (firstPaintFrame !== null) {
+        window.cancelAnimationFrame(firstPaintFrame);
+      }
+      if (secondPaintFrame !== null) {
+        window.cancelAnimationFrame(secondPaintFrame);
+      }
       runningAnimations.current.forEach((animation) => animation.cancel());
       runningAnimations.current = [];
     };
