@@ -169,10 +169,9 @@ export function Scrapbook({ content }: ScrapbookProps) {
     mode !== "mobile"
       ? -1
       : visualTurn
-        ? Math.min(
-            visualTurn.sourcePageIndex,
-            visualTurn.destinationPageIndex,
-          ) - 1
+        ? visualTurn.direction === "forward"
+          ? visualTurn.sourcePageIndex
+          : visualTurn.destinationPageIndex - 1
         : turner.activePageIndex - 1;
   const parkedStackStartPageIndex = Math.max(
     0,
@@ -191,6 +190,9 @@ export function Scrapbook({ content }: ScrapbookProps) {
 
             return {
               pageIndex,
+              staged:
+                visualTurn?.direction === "forward" &&
+                pageIndex === visualTurn.sourcePageIndex,
               content: (
                 <SpreadRenderer
                   activePageIndex={pageIndex}

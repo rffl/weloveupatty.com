@@ -52,8 +52,10 @@ export const fullTurnDistanceRatio = 0.72;
 export const minimumFullTurnDistance = 120;
 export const desktopAutomaticTurnDurationMs = 680;
 export const mobileAutomaticTurnDurationMs = 480;
+export const mobileForwardAutomaticTurnDurationMs = 600;
 export const reducedTurnDurationMs = 140;
 export const turnEasing = "cubic-bezier(0.22, 0.7, 0.2, 1)";
+export const mobileForwardTurnEasing = "cubic-bezier(0.4, 0, 0.25, 1)";
 const maximumTurnAngleDegrees = 178;
 const maximumTurnAngleRadians =
   (maximumTurnAngleDegrees * Math.PI) / 180;
@@ -138,6 +140,7 @@ export function adjacentPageIndex(input: {
 
 export function settleDurationMs(input: {
   source: TurnInputSource;
+  direction: TurnDirection;
   settleTarget: TurnSettleTarget;
   startProgress: number;
   velocityPxPerMs: number;
@@ -149,8 +152,12 @@ export function settleDurationMs(input: {
   }
 
   if (input.source === "automatic") {
-    return input.mode === "desktop"
-      ? desktopAutomaticTurnDurationMs
+    if (input.mode === "desktop") {
+      return desktopAutomaticTurnDurationMs;
+    }
+
+    return input.direction === "forward"
+      ? mobileForwardAutomaticTurnDurationMs
       : mobileAutomaticTurnDurationMs;
   }
 

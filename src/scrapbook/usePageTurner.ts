@@ -130,6 +130,7 @@ export function usePageTurner({
 
       const durationMs = settleDurationMs({
         source: "automatic",
+        direction: turn.direction,
         settleTarget: "destination",
         startProgress: 0,
         velocityPxPerMs: 0,
@@ -282,6 +283,7 @@ export function usePageTurner({
       const startProgress = clampProgress(release.progress);
       const durationMs = settleDurationMs({
         source,
+        direction: current.turn.direction,
         settleTarget: resolvedTarget,
         startProgress,
         velocityPxPerMs: release.velocityTowardDirectionPxPerMs,

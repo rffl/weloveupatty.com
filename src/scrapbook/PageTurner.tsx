@@ -3,6 +3,7 @@ import type { MouseEventHandler, ReactNode } from "react";
 
 import type { ResponsiveMode } from "../layouts/types";
 import {
+  mobileForwardTurnEasing,
   turnAngleDegrees,
   turnDepth,
   turnEasing,
@@ -18,7 +19,17 @@ import { isInteractiveTarget, useSwipeGesture } from "./useSwipeGesture";
 export type ParkedPageLayer = Readonly<{
   pageIndex: number;
   content: ReactNode;
+  staged?: boolean;
 }>;
+
+const stagedLeafRevealStart = 0.84;
+
+function stagedLeafOpacity(progress: number): number {
+  return Math.max(
+    0,
+    Math.min(1, (progress - stagedLeafRevealStart) / (1 - stagedLeafRevealStart)),
+  );
+}
 
 type PageTurnerProps = {
   children: ReactNode;
@@ -72,6 +83,7 @@ export function PageTurner({
   const shadingRef = useRef<HTMLSpanElement>(null);
   const gutterShadeRef = useRef<HTMLSpanElement>(null);
   const destinationRef = useRef<HTMLDivElement>(null);
+  const stagedParkedLeafRef = useRef<HTMLDivElement>(null);
   const visualProgress = useRef(0);
   const gestureDirection = useRef<TurnDirection | null>(null);
   const visualFrame = useRef<number | null>(null);
@@ -95,6 +107,7 @@ export function PageTurner({
       const edge = edgeRef.current;
       const shading = shadingRef.current;
       const gutterShade = gutterShadeRef.current;
+      const stagedParkedLeaf = stagedParkedLeafRef.current;
       const angle = turnAngleDegrees({ mode, direction, progress });
       const depth = turnDepth(progress);
 
@@ -116,6 +129,9 @@ export function PageTurner({
       if (gutterShade) {
         gutterShade.style.opacity = `${depth * 0.42}`;
         gutterShade.style.transform = `scaleX(${0.35 + depth * 0.65})`;
+      }
+      if (stagedParkedLeaf) {
+        stagedParkedLeaf.style.opacity = `${stagedLeafOpacity(progress)}`;
       }
     },
     [mode, reducedMotion],
@@ -308,16 +324,19 @@ export function PageTurner({
     const edge = edgeRef.current;
     const shading = shadingRef.current;
     const gutterShade = gutterShadeRef.current;
+    const stagedParkedLeaf = stagedParkedLeafRef.current;
 
     if (!leaf || !castShadow || !edge || !shading || !gutterShade) {
       complete();
       return;
     }
 
-    const needsPaintWarmup =
+    const usesMobileForwardMotion =
       mode === "mobile" &&
       turn.direction === "forward" &&
-      turnState.inputSource === "automatic" &&
+      turnState.inputSource === "automatic";
+    const needsPaintWarmup =
+      usesMobileForwardMotion &&
       settleTarget === "destination" &&
       startProgress === 0;
     const progressStops = [startProgress];
@@ -364,6 +383,25 @@ export function PageTurner({
       opacity: turnDepth(progress) * 0.42,
       transform: `scaleX(${0.35 + turnDepth(progress) * 0.65})`,
     }));
+    const crossesStagedReveal =
+      (startProgress < stagedLeafRevealStart &&
+        destinationProgress > stagedLeafRevealStart) ||
+      (startProgress > stagedLeafRevealStart &&
+        destinationProgress < stagedLeafRevealStart);
+    const stagedFrames = stagedParkedLeaf
+      ? [
+          { offset: 0, opacity: stagedLeafOpacity(startProgress) },
+          ...(crossesStagedReveal
+            ? [
+                {
+                  offset: offsetFor(stagedLeafRevealStart),
+                  opacity: 0,
+                },
+              ]
+            : []),
+          { offset: 1, opacity: stagedLeafOpacity(destinationProgress) },
+        ]
+      : null;
     let disposed = false;
     let firstPaintFrame: number | null = null;
     let secondPaintFrame: number | null = null;
@@ -375,7 +413,7 @@ export function PageTurner({
 
       const options: KeyframeAnimationOptions = {
         duration: durationMs,
-        easing: turnEasing,
+        easing: usesMobileForwardMotion ? mobileForwardTurnEasing : turnEasing,
         fill: needsPaintWarmup ? "both" : "forwards",
       };
       const leafAnimation = leaf.animate(leafFrames, options);
@@ -383,12 +421,17 @@ export function PageTurner({
       const edgeAnimation = edge.animate(edgeFrames, options);
       const shadingAnimation = shading.animate(shadingFrames, options);
       const gutterAnimation = gutterShade.animate(gutterFrames, options);
+      const stagedAnimation =
+        stagedParkedLeaf && stagedFrames
+          ? stagedParkedLeaf.animate(stagedFrames, options)
+          : null;
       runningAnimations.current = [
         leafAnimation,
         shadowAnimation,
         edgeAnimation,
         shadingAnimation,
         gutterAnimation,
+        ...(stagedAnimation ? [stagedAnimation] : []),
       ];
       leafAnimation.finished.then(complete).catch(() => undefined);
     };
@@ -521,7 +564,9 @@ export function PageTurner({
                 <div
                   className="page-turner__parked-leaf"
                   data-stack-depth={depth}
+                  data-staged={page.staged || undefined}
                   key={page.pageIndex}
+                  ref={page.staged ? stagedParkedLeafRef : undefined}
                 >
                   <div
                     className="page-turner__leaf-face page-turner__leaf-face--back"

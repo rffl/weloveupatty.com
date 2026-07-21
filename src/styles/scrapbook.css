@@ -373,6 +373,11 @@
     transform: rotateY(-178deg);
   }
 
+  .page-turner[data-mode="mobile"] .page-turner__parked-leaf[data-staged] {
+    opacity: 0;
+    will-change: opacity;
+  }
+
   .page-turner[data-mode="mobile"]
     .page-turner__parked-leaf[data-stack-depth="1"] {
     bottom: 0.18rem;
