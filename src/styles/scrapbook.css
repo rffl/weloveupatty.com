@@ -311,6 +311,10 @@
     display: none;
   }
 
+  .page-turner[data-mode="mobile"] .page-turner__cast-shadow {
+    display: none;
+  }
+
   .page-turner[data-mode="mobile"] .page-turner__gutter-shade {
     right: auto;
     left: 0;
@@ -365,7 +369,9 @@
 
   .page-turner[data-mode="mobile"]
     .page-turner__parked-leaf[data-stack-depth="1"] {
+    bottom: 0.18rem;
     z-index: 2;
+    height: calc(100% - 0.18rem);
     transform: translateY(0.18rem) translateZ(-0.8px) rotateY(-178deg);
   }
 
@@ -381,10 +387,12 @@
   }
 
   .page-turner[data-mode="mobile"] .page-turner__parked-depth::before {
+    bottom: 0.34rem;
     transform: translateY(0.34rem) translateZ(-1.6px) rotateY(-178deg);
   }
 
   .page-turner[data-mode="mobile"] .page-turner__parked-depth::after {
+    bottom: 0.5rem;
     transform: translateY(0.5rem) translateZ(-2.4px) rotateY(-178deg);
   }
 
