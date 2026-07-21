@@ -937,6 +937,15 @@
   }
 
   .scrapbook-control[data-turning]:not([data-boundary]) {
+    opacity: 0.72;
+  }
+
+  .scrapbook-control[data-buffering]:not([data-boundary]) {
+    cursor: pointer;
+    opacity: 0.88;
+  }
+
+  .scrapbook-control[aria-disabled="true"]:not([data-boundary]) {
     cursor: wait;
     opacity: 0.58;
   }

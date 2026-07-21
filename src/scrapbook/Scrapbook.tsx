@@ -331,7 +331,8 @@ export function Scrapbook({ content }: ScrapbookProps) {
             activeStep={turner.activeStep}
             canNext={turner.canNext}
             canPrevious={turner.canPrevious}
-            isTurning={turner.isBusy}
+            interactionLocked={turner.isDragging}
+            isBusy={turner.isBusy}
             onNext={requestNext}
             onPrevious={requestPrevious}
             totalSteps={turner.totalSteps}

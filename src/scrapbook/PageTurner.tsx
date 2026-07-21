@@ -54,6 +54,7 @@ export function PageTurner({
   onDragRelease,
   onDragCancel,
   onTurnComplete,
+  onLayoutChange,
 }: PageTurnerProps) {
   const surfaceRef = useRef<HTMLDivElement>(null);
   const leafRef = useRef<HTMLDivElement>(null);
@@ -70,6 +71,7 @@ export function PageTurner({
     direction: TurnDirection;
   } | null>(null);
   const runningAnimations = useRef<Animation[]>([]);
+  const previousInteractionContext = useRef({ mode, reducedMotion });
 
   const applyProgress = useCallback(
     (progress: number, direction: TurnDirection) => {
@@ -144,7 +146,12 @@ export function PageTurner({
     };
   }, []);
 
-  const { isTracking, consumeClickSuppression, gestureProps } =
+  const {
+    isTracking,
+    cancelTracking,
+    consumeClickSuppression,
+    gestureProps,
+  } =
     useSwipeGesture({
       enabled,
       directManipulationEnabled: turnState.phase === "idle",
@@ -175,6 +182,57 @@ export function PageTurner({
       onSwipeLeft: onNext,
       onSwipeRight: onPrevious,
     });
+
+  useLayoutEffect(() => {
+    const surface = surfaceRef.current;
+
+    if (!surface) {
+      return;
+    }
+
+    let previousSize: { width: number; height: number } | null = null;
+    const observer = new ResizeObserver(([entry]) => {
+      if (!entry) {
+        return;
+      }
+
+      const nextSize = {
+        width: entry.contentRect.width,
+        height: entry.contentRect.height,
+      };
+
+      if (previousSize) {
+        const widthChange =
+          Math.abs(nextSize.width - previousSize.width) /
+          Math.max(1, previousSize.width);
+        const heightChange =
+          Math.abs(nextSize.height - previousSize.height) /
+          Math.max(1, previousSize.height);
+
+        if (Math.max(widthChange, heightChange) >= 0.04) {
+          cancelTracking();
+          onLayoutChange();
+        }
+      }
+
+      previousSize = nextSize;
+    });
+
+    observer.observe(surface);
+    return () => observer.disconnect();
+  }, [cancelTracking, onLayoutChange]);
+
+  useLayoutEffect(() => {
+    const previous = previousInteractionContext.current;
+    previousInteractionContext.current = { mode, reducedMotion };
+
+    if (
+      previous.mode !== mode ||
+      previous.reducedMotion !== reducedMotion
+    ) {
+      cancelTracking();
+    }
+  }, [cancelTracking, mode, reducedMotion]);
 
   useLayoutEffect(() => {
     if (visualFrame.current !== null) {

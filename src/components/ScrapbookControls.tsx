@@ -3,7 +3,8 @@ type ScrapbookControlsProps = {
   totalSteps: number;
   canPrevious: boolean;
   canNext: boolean;
-  isTurning: boolean;
+  isBusy: boolean;
+  interactionLocked: boolean;
   onPrevious: () => void;
   onNext: () => void;
 };
@@ -13,25 +14,28 @@ export function ScrapbookControls({
   totalSteps,
   canPrevious,
   canNext,
-  isTurning,
+  isBusy,
+  interactionLocked,
   onPrevious,
   onNext,
 }: ScrapbookControlsProps) {
-  const previousUnavailable = !canPrevious || isTurning;
-  const nextUnavailable = !canNext || isTurning;
+  const previousUnavailable = !canPrevious || interactionLocked;
+  const nextUnavailable = !canNext || interactionLocked;
+  const canBuffer = isBusy && !interactionLocked;
 
   return (
     <nav
-      aria-busy={isTurning || undefined}
+      aria-busy={isBusy || undefined}
       aria-label="Scrapbook pages"
       className="scrapbook-controls"
-      data-turning={isTurning || undefined}
+      data-turning={isBusy || undefined}
     >
       <button
         aria-disabled={previousUnavailable}
         className="scrapbook-control scrapbook-control--previous"
         data-boundary={!canPrevious || undefined}
-        data-turning={isTurning || undefined}
+        data-buffering={canBuffer || undefined}
+        data-turning={isBusy || undefined}
         onClick={() => {
           if (!previousUnavailable) {
             onPrevious();
@@ -51,7 +55,8 @@ export function ScrapbookControls({
         aria-disabled={nextUnavailable}
         className="scrapbook-control scrapbook-control--next"
         data-boundary={!canNext || undefined}
-        data-turning={isTurning || undefined}
+        data-buffering={canBuffer || undefined}
+        data-turning={isBusy || undefined}
         onClick={() => {
           if (!nextUnavailable) {
             onNext();
