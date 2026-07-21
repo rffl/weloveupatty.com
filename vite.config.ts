@@ -4,6 +4,8 @@ import { defineConfig } from "vite";
 
 import { scrapbook } from "./src/content/scrapbook";
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll("&", "&amp;")
@@ -14,19 +16,15 @@ function escapeHtml(value: string): string {
 }
 
 export default defineConfig({
-  plugins: [
-    {
-      name: "scrapbook-html-metadata",
-      transformIndexHtml(html) {
-        return html
-          .replace("__SCRAPBOOK_TITLE__", escapeHtml(scrapbook.title))
-          .replace(
-            "__SCRAPBOOK_DESCRIPTION__",
-            escapeHtml(scrapbook.metadata.description),
-          );
-      },
+  plugins: [{
+    name: "scrapbook-html-metadata",
+    transformIndexHtml(html) {
+      return html
+        .replace("__SCRAPBOOK_TITLE__", escapeHtml(scrapbook.title))
+        .replace(
+          "__SCRAPBOOK_DESCRIPTION__",
+          escapeHtml(scrapbook.metadata.description),
+        );
     },
-    react(),
-    tailwindcss(),
-  ],
+  }, react(), tailwindcss(), cloudflare()],
 });
