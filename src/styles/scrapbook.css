@@ -88,9 +88,8 @@
     transform: translateX(-50%);
   }
 
-  .scrapbook-experience[data-mode="desktop"]
-    .scrapbook-book[data-page-turning]::after {
-    opacity: 0;
+  .scrapbook-experience[data-mode="desktop"] .scrapbook-book::after {
+    display: none;
   }
 
   .scrapbook-page-region {
@@ -191,7 +190,7 @@
       rgb(39 21 14 / 34%)
     );
     box-shadow: 0 0 0.7rem rgb(45 24 15 / 25%);
-    transform: translateX(-50%) translateZ(-1px);
+    transform: translateX(-50%);
   }
 
   .page-turner__turning-leaf {
@@ -446,6 +445,7 @@
     .page-turner__turning-leaf {
     right: 50%;
     left: 0;
+    z-index: 38;
     transform-origin: right center;
   }
 

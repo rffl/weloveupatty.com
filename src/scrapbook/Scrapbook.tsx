@@ -309,7 +309,6 @@ export function Scrapbook({ content }: ScrapbookProps) {
           aria-label={content.title}
           className="scrapbook-book"
           data-cover-phase={coverPhase}
-          data-page-turning={visualTurn !== null || undefined}
           role="group"
         >
           <div

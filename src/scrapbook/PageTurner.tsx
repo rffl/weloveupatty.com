@@ -15,6 +15,26 @@ import type {
 } from "./pageTurnMotion";
 import { isInteractiveTarget, useSwipeGesture } from "./useSwipeGesture";
 
+const desktopBackwardLiftProgress = 0.1;
+const desktopForwardTuckProgress = 0.9;
+
+function turningLeafZIndex(input: {
+  mode: ResponsiveMode;
+  direction: TurnDirection;
+  progress: number;
+}): number {
+  if (input.mode !== "desktop") {
+    return 40;
+  }
+
+  const tuckedUnderBinding =
+    input.direction === "forward"
+      ? input.progress >= desktopForwardTuckProgress
+      : input.progress <= desktopBackwardLiftProgress;
+
+  return tuckedUnderBinding ? 38 : 40;
+}
+
 export type ParkedPageLayer = Readonly<{
   pageIndex: number;
   content: ReactNode;
@@ -100,6 +120,11 @@ export function PageTurner({
 
       if (leaf) {
         leaf.style.transform = `rotateY(${angle}deg)`;
+        leaf.style.zIndex = `${turningLeafZIndex({
+          mode,
+          direction,
+          progress,
+        })}`;
       }
       if (castShadow) {
         castShadow.style.opacity = `${depth * 0.48}`;
@@ -314,15 +339,31 @@ export function PageTurner({
       return;
     }
 
-    const progressStops = [startProgress];
-    const crossesMidpoint =
-      (startProgress < 0.5 && destinationProgress > 0.5) ||
-      (startProgress > 0.5 && destinationProgress < 0.5);
-
-    if (crossesMidpoint) {
-      progressStops.push(0.5);
-    }
-    progressStops.push(destinationProgress);
+    const transitionProgress =
+      mode !== "desktop"
+        ? []
+        : turn.direction === "forward"
+          ? [
+              desktopForwardTuckProgress - 0.001,
+              desktopForwardTuckProgress + 0.001,
+            ]
+          : [
+              desktopBackwardLiftProgress - 0.001,
+              desktopBackwardLiftProgress + 0.001,
+            ];
+    const candidates = [0.5, ...transitionProgress].filter(
+      (progress) =>
+        progress > Math.min(startProgress, destinationProgress) &&
+        progress < Math.max(startProgress, destinationProgress),
+    );
+    candidates.sort((a, b) =>
+      destinationProgress > startProgress ? a - b : b - a,
+    );
+    const progressStops = [
+      startProgress,
+      ...candidates,
+      destinationProgress,
+    ];
 
     const offsetFor = (progress: number) => {
       const distance = Math.abs(destinationProgress - startProgress);
@@ -337,6 +378,11 @@ export function PageTurner({
         direction: turn.direction,
         progress,
       })}deg)`,
+      zIndex: `${turningLeafZIndex({
+        mode,
+        direction: turn.direction,
+        progress,
+      })}`,
     }));
     const depthFrames = progressStops.map((progress) => ({
       offset: offsetFor(progress),
@@ -512,52 +558,56 @@ export function PageTurner({
         {children}
       </div>
 
-      {activeTurn ? (
+      {mode === "desktop" || activeTurn ? (
         <div aria-hidden="true" className="page-turner__scene" inert>
-          <div className="page-turner__destination" ref={destinationRef}>
-            {destinationContent}
-          </div>
-
           {mode === "desktop" ? (
+            <span className="page-turner__scene-spine" />
+          ) : null}
+          {activeTurn ? (
             <>
-              <div className="page-turner__stationary-source">
-                <div className="page-turner__visual-composition">
-                  {sourceContent}
-                </div>
+              <div className="page-turner__destination" ref={destinationRef}>
+                {destinationContent}
               </div>
-              <span className="page-turner__scene-spine" />
+
+              {mode === "desktop" ? (
+                <div className="page-turner__stationary-source">
+                  <div className="page-turner__visual-composition">
+                    {sourceContent}
+                  </div>
+                </div>
+              ) : null}
+
+              <span
+                className="page-turner__cast-shadow"
+                ref={castShadowRef}
+              />
+              <span
+                className="page-turner__gutter-shade"
+                ref={gutterShadeRef}
+              />
+
+              <div className="page-turner__turning-leaf" ref={leafRef}>
+                <div className="page-turner__leaf-face page-turner__leaf-face--front">
+                  <div className="page-turner__visual-composition">
+                    {leafFrontContent}
+                  </div>
+                </div>
+                <div
+                  className="page-turner__leaf-face page-turner__leaf-face--back"
+                  data-paper-back={mode === "mobile" || undefined}
+                >
+                  <div className="page-turner__visual-composition">
+                    {leafBackContent}
+                  </div>
+                </div>
+                <span
+                  className="page-turner__leaf-shading"
+                  ref={shadingRef}
+                />
+                <span className="page-turner__leaf-edge" ref={edgeRef} />
+              </div>
             </>
           ) : null}
-
-          <span
-            className="page-turner__cast-shadow"
-            ref={castShadowRef}
-          />
-          <span
-            className="page-turner__gutter-shade"
-            ref={gutterShadeRef}
-          />
-
-          <div className="page-turner__turning-leaf" ref={leafRef}>
-            <div className="page-turner__leaf-face page-turner__leaf-face--front">
-              <div className="page-turner__visual-composition">
-                {leafFrontContent}
-              </div>
-            </div>
-            <div
-              className="page-turner__leaf-face page-turner__leaf-face--back"
-              data-paper-back={mode === "mobile" || undefined}
-            >
-              <div className="page-turner__visual-composition">
-                {leafBackContent}
-              </div>
-            </div>
-            <span
-              className="page-turner__leaf-shading"
-              ref={shadingRef}
-            />
-            <span className="page-turner__leaf-edge" ref={edgeRef} />
-          </div>
         </div>
       ) : null}
     </div>
