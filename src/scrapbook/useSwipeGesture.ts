@@ -1,10 +1,12 @@
 import { useCallback, useRef, useState } from "react";
 import type { PointerEventHandler } from "react";
 
+import type { ResponsiveMode } from "../layouts/types";
 import {
   clickSuppressionDistance,
   directionLockDistance,
   progressForDistance,
+  progressForProjectedEdge,
   shouldCommitSwipe,
 } from "./pageTurnMotion";
 import type {
@@ -16,6 +18,7 @@ import type {
 type SwipeGestureOptions = {
   enabled: boolean;
   directManipulationEnabled: boolean;
+  mode: ResponsiveMode;
   onDragStart: (direction: TurnDirection) => TurnSnapshot | null;
   onDragProgress: (turnId: number, progress: number) => void;
   onDragRelease: (release: GestureRelease) => void;
@@ -49,6 +52,16 @@ function distanceTowardDirection(
   return direction === "forward" ? -distancePx : distancePx;
 }
 
+function dragProgress(
+  distanceTowardDirectionPx: number,
+  surfaceWidthPx: number,
+  mode: ResponsiveMode,
+): number {
+  return mode === "mobile"
+    ? progressForProjectedEdge(distanceTowardDirectionPx, surfaceWidthPx)
+    : progressForDistance(distanceTowardDirectionPx, surfaceWidthPx);
+}
+
 function velocityTowardDirection(
   samples: readonly PointerSample[],
   currentX: number,
@@ -77,6 +90,7 @@ function velocityTowardDirection(
 export function useSwipeGesture({
   enabled,
   directManipulationEnabled,
+  mode,
   onDragStart,
   onDragProgress,
   onDragRelease,
@@ -214,9 +228,10 @@ export function useSwipeGesture({
         horizontal,
         direction,
       );
-      const progress = progressForDistance(
+      const progress = dragProgress(
         distanceTowardDirectionPx,
         surfaceWidth.current,
+        mode,
       );
       latestProgress.current = progress;
       onDragProgress(activeTurnId.current, progress);
@@ -243,9 +258,10 @@ export function useSwipeGesture({
       event.timeStamp,
       direction,
     );
-    const progress = progressForDistance(
+    const progress = dragProgress(
       distanceTowardDirectionPx,
       surfaceWidth.current,
+      mode,
     );
 
     if (Math.hypot(horizontal, vertical) >= clickSuppressionDistance) {

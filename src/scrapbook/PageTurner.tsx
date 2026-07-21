@@ -19,6 +19,7 @@ type PageTurnerProps = {
   children: ReactNode;
   sourceContent: ReactNode | null;
   destinationContent: ReactNode | null;
+  parkedPreviousContent: ReactNode | null;
   mode: ResponsiveMode;
   reducedMotion: boolean;
   enabled: boolean;
@@ -40,6 +41,7 @@ export function PageTurner({
   children,
   sourceContent,
   destinationContent,
+  parkedPreviousContent,
   mode,
   reducedMotion,
   enabled,
@@ -155,6 +157,7 @@ export function PageTurner({
     useSwipeGesture({
       enabled,
       directManipulationEnabled: turnState.phase === "idle",
+      mode,
       onDragStart: (direction) => {
         const turn = onDragStart(direction);
 
@@ -425,13 +428,17 @@ export function PageTurner({
   };
 
   const activeTurn = turnState.phase === "idle" ? null : turnState.turn;
+  const showParkedLeaf =
+    mode === "mobile" && activeTurn === null && parkedPreviousContent !== null;
   const direction = activeTurn?.direction;
   const mobileBackward = mode === "mobile" && direction === "backward";
   const leafFrontContent = mobileBackward
     ? destinationContent
     : sourceContent;
   const leafBackContent =
-    mode === "desktop" ? destinationContent : sourceContent;
+    mode === "desktop" || mobileBackward
+      ? destinationContent
+      : sourceContent;
 
   return (
     <div
@@ -446,6 +453,22 @@ export function PageTurner({
       ref={surfaceRef}
       {...gestureProps}
     >
+      {showParkedLeaf ? (
+        <>
+          <div aria-hidden="true" className="page-turner__parked-leaf">
+            <div
+              className="page-turner__leaf-face page-turner__leaf-face--back"
+              data-paper-back
+            >
+              <div className="page-turner__visual-composition">
+                {parkedPreviousContent}
+              </div>
+            </div>
+          </div>
+          <span aria-hidden="true" className="page-turner__parked-grab-zone" />
+        </>
+      ) : null}
+
       <div
         aria-hidden={isBusy || undefined}
         className="page-turner__content"

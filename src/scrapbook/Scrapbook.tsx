@@ -157,6 +157,18 @@ export function Scrapbook({ content }: ScrapbookProps) {
       pages={pages}
     />
   ) : null;
+  const parkedPreviousContent =
+    mode === "mobile" && turner.activePageIndex > 0 ? (
+      <SpreadRenderer
+        activePageIndex={turner.activePageIndex - 1}
+        decorationLabels={content.recipeDecorationLabels}
+        desktopSpreads={desktopSpreads}
+        engagementEnabled={false}
+        mode={mode}
+        onRememberPage={turner.rememberPage}
+        pages={pages}
+      />
+    ) : null;
 
   useLayoutEffect(() => {
     if (coverPhase === "open" && focusContentAfterOpening.current) {
@@ -295,6 +307,7 @@ export function Scrapbook({ content }: ScrapbookProps) {
               onNext={requestNext}
               onPrevious={requestPrevious}
               onTurnComplete={turner.completeSettle}
+              parkedPreviousContent={parkedPreviousContent}
               reducedMotion={reducedMotion}
               sourceContent={sourceContent}
               turnState={turner.turnState}

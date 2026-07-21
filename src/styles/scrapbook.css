@@ -62,10 +62,10 @@
     border-radius: 0.45rem 0.8rem 0.8rem 0.45rem;
     box-shadow:
       var(--shadow-book),
+      0 2rem 1.4rem rgb(23 12 8 / 28%),
       inset 0 0 0 2px rgb(237 212 175 / 12%);
     container-name: scrapbook-book;
     container-type: size;
-    filter: drop-shadow(0 2rem 1.4rem rgb(23 12 8 / 28%));
     transform-style: preserve-3d;
   }
 
@@ -131,6 +131,7 @@
   .page-turner__scene,
   .page-turner__destination,
   .page-turner__turning-leaf,
+  .page-turner__parked-leaf,
   .page-turner__leaf-face,
   .page-turner__visual-composition {
     width: 100%;
@@ -140,6 +141,7 @@
   .page-turner__scene,
   .page-turner__destination,
   .page-turner__turning-leaf,
+  .page-turner__parked-leaf,
   .page-turner__leaf-face,
   .page-turner__cast-shadow,
   .page-turner__gutter-shade {
@@ -279,6 +281,11 @@
     will-change: opacity, transform;
   }
 
+  .page-turner[data-mode="desktop"] .page-turner__cast-shadow,
+  .page-turner[data-mode="desktop"] .page-turner__gutter-shade {
+    display: none;
+  }
+
   .page-turner[data-mode="mobile"] .page-turner__gutter-shade {
     right: auto;
     left: 0;
@@ -300,6 +307,26 @@
   .page-turner[data-mode="mobile"] .page-turner__turning-leaf {
     inset: 0;
     transform-origin: left center;
+  }
+
+  .page-turner[data-mode="mobile"] .page-turner__parked-leaf {
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    transform: rotateY(-178deg);
+    transform-origin: left center;
+    transform-style: preserve-3d;
+  }
+
+  .page-turner__parked-grab-zone {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    bottom: 0;
+    z-index: 5;
+    width: clamp(3.25rem, 16cqw, 4rem);
+    pointer-events: auto;
+    touch-action: pan-y pinch-zoom;
   }
 
   .page-turner[data-mode="desktop"] .page-turner__turning-leaf,
@@ -1134,6 +1161,10 @@
         rgb(255 245 225 / 13%),
         rgb(39 21 14 / 26%)
       );
+    }
+
+    .scrapbook-experience[data-mode="mobile"] .scrapbook-page-region {
+      overflow: visible;
     }
 
     .mobile-page {

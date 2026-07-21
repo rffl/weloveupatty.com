@@ -71,6 +71,17 @@ export function progressForDistance(
   );
 }
 
+export function progressForProjectedEdge(
+  distanceTowardDirectionPx: number,
+  pageWidthPx: number,
+): number {
+  const distance = Math.max(0, distanceTowardDirectionPx);
+  const width = Math.max(1, pageWidthPx);
+  const projectedEdge = Math.max(-1, Math.min(1, 1 - distance / width));
+
+  return clampProgress(Math.acos(projectedEdge) / Math.PI);
+}
+
 export function shouldCommitSwipe(input: {
   distanceTowardDirectionPx: number;
   velocityTowardDirectionPxPerMs: number;

@@ -233,11 +233,7 @@ export function usePageTurner({
       const sourcePageIndex = activePageIndexRef.current;
       const destinationPageIndex = adjacentFrom(sourcePageIndex, direction);
 
-      if (
-        destinationPageIndex === null &&
-        direction === "backward" &&
-        sourcePageIndex === 0
-      ) {
+      if (destinationPageIndex === null) {
         return null;
       }
 
@@ -245,8 +241,8 @@ export function usePageTurner({
         id: nextTurnId.current + 1,
         direction,
         sourcePageIndex,
-        destinationPageIndex: destinationPageIndex ?? sourcePageIndex,
-        canCommit: destinationPageIndex !== null,
+        destinationPageIndex,
+        canCommit: true,
         mode,
       };
       nextTurnId.current = turn.id;
